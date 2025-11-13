@@ -1,0 +1,4163 @@
+{
+  "name": "01_PROYECTO ACTAS VISITA OBRA - 11-2025",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message",
+          "edited_message",
+          "*"
+        ],
+        "additionalFields": {
+          "download": true
+        }
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -144,
+        224
+      ],
+      "id": "eeaf8fc9-d256-4592-899a-a8d550b73569",
+      "name": "01_Recibir Mensaje",
+      "webhookId": "22a4c3fd-8859-4e6e-97a0-9aafaa605764",
+      "credentials": {
+        "telegramApi": {
+          "id": "zsEfatxtBaKa0n2X",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "19aktC1hWn0lzbkY9ZevMxzPf6yG6pZrfCDAlkPOC33k",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Hoja_1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19aktC1hWn0lzbkY9ZevMxzPf6yG6pZrfCDAlkPOC33k/edit#gid=0"
+        },
+        "options": {
+          "dataLocationOnSheet": {
+            "values": {
+              "rangeDefinition": "specifyRangeA1",
+              "range": "F:F"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        624,
+        16
+      ],
+      "id": "b043d608-2f01-4b13-86ec-7b5cce15a0e5",
+      "name": "03_Buscar Visita",
+      "alwaysOutputData": true,
+      "retryOnFail": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "oayhnXmmc5zlNysm",
+          "name": "Google Sheets account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ $json.Id_Documento }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insert",
+              "text": "={{ $json.hora }} {{ $json.arquitecto }}: {{ $json.message.text }}\n\n"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        2928,
+        32
+      ],
+      "id": "38ca7c6f-d7c0-4a3b-95cd-1a4dc97215a3",
+      "name": "09a_Guardar Texto",
+      "alwaysOutputData": true,
+      "retryOnFail": true,
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "8E62v5jsiektAUOd",
+          "name": "Google Docs account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "name": "={{ $json.fecha }} {{ $json.obra }} {{ $json.arquitecto }} {{ $json.hora }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $json.Id_Carpeta }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        3056,
+        432
+      ],
+      "id": "65138cd3-45e7-452c-ab66-8f28fb51ea1a",
+      "name": "09b_Guardar Archivo",
+      "retryOnFail": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "vwcZPpkJ3FGQ2goC",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "19aktC1hWn0lzbkY9ZevMxzPf6yG6pZrfCDAlkPOC33k",
+          "mode": "list"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Hoja_1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19aktC1hWn0lzbkY9ZevMxzPf6yG6pZrfCDAlkPOC33k/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Estado": "cerrada",
+            "chatId": "={{ $('01_Recibir Mensaje').item.json.message.chat.id }}",
+            "Hora_fin": "={{ $json.hora }}"
+          },
+          "matchingColumns": [
+            "chatId"
+          ],
+          "schema": [
+            {
+              "id": "Obra",
+              "displayName": "Obra",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha",
+              "displayName": "Fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Arquitecto",
+              "displayName": "Arquitecto",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Hora_Inicio",
+              "displayName": "Hora_Inicio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "chatId",
+              "displayName": "chatId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Estado",
+              "displayName": "Estado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora_fin",
+              "displayName": "Hora_fin",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Id_Documento",
+              "displayName": "Id_Documento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Id_Carpeta",
+              "displayName": "Id_Carpeta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2736,
+        896
+      ],
+      "id": "0089fd57-78ec-4912-8550-b665b3688c6c",
+      "name": "09c_Cerrar Sheet",
+      "retryOnFail": false,
+      "maxTries": 5,
+      "notesInFlow": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "oayhnXmmc5zlNysm",
+          "name": "Google Sheets account"
+        }
+      },
+      "notes": "oken-bucket throttle universal para Google APIs."
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "={{ $json.fecha }} / {{ $json.message.chat.title }} / {{ $json.arquitecto }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1NIG_zD_tKGhlDkxCu_j2mbrNwPECsLWS",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1984,
+        1248
+      ],
+      "id": "c2185e3a-15cf-4707-8692-c47cf35b40c9",
+      "name": "11a_Crear Carpeta",
+      "retryOnFail": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "vwcZPpkJ3FGQ2goC",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "folderId": "={{ $('11a_Crear Carpeta').item.json.id }}",
+        "title": "=Acta {{ $json.name }}"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        2576,
+        1248
+      ],
+      "id": "fd21460f-5c9a-4e26-95d6-f75866a72909",
+      "name": "11b_Crear Documento",
+      "retryOnFail": true,
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "8E62v5jsiektAUOd",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "19aktC1hWn0lzbkY9ZevMxzPf6yG6pZrfCDAlkPOC33k",
+          "mode": "list"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Hoja_1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19aktC1hWn0lzbkY9ZevMxzPf6yG6pZrfCDAlkPOC33k/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Obra": "={{ $('Iniciar Visita').item.json.obra }}",
+            "Fecha": "={{ $('Iniciar Visita').item.json.fecha }}",
+            "Arquitecto": "={{ $('Iniciar Visita').item.json.arquitecto }}",
+            "Hora_Inicio": "={{ $('Iniciar Visita').item.json.hora }}",
+            "chatId": "={{ $('Iniciar Visita').item.json.chat_id }}",
+            "Estado": "activa",
+            "Id_Documento": "={{ $json.id }}",
+            "Id_Carpeta": "={{ $('11a_Crear Carpeta').item.json.id }}"
+          },
+          "matchingColumns": [
+            "Obra"
+          ],
+          "schema": [
+            {
+              "id": "Obra",
+              "displayName": "Obra",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fecha",
+              "displayName": "Fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Arquitecto",
+              "displayName": "Arquitecto",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora_Inicio",
+              "displayName": "Hora_Inicio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "chatId",
+              "displayName": "chatId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Estado",
+              "displayName": "Estado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora_fin",
+              "displayName": "Hora_fin",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Id_Documento",
+              "displayName": "Id_Documento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Id_Carpeta",
+              "displayName": "Id_Carpeta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2768,
+        1248
+      ],
+      "id": "c842768d-80b6-46d1-9c04-f289072f263f",
+      "name": "11c_Crear Fila",
+      "retryOnFail": false,
+      "maxTries": 5,
+      "notesInFlow": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "oayhnXmmc5zlNysm",
+          "name": "Google Sheets account"
+        }
+      },
+      "notes": "oken-bucket throttle universal para Google APIs."
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Merge').item.json.chat_id }}",
+        "text": "¡Visita Creada! Ponte las medidas de seguridad oportunas segun se indica en PRL. :)",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2944,
+        1248
+      ],
+      "id": "51e9f22d-b258-4695-a91a-9a35b6639106",
+      "name": "13a_Visita Creada",
+      "webhookId": "f88831ea-f07c-41c9-8757-0e6e4ef2e1f0",
+      "credentials": {
+        "telegramApi": {
+          "id": "zsEfatxtBaKa0n2X",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('01_Recibir Mensaje').item.json.message.chat.id }}",
+        "text": "Visita a Obra cerrada. Espero que pases un buen día :)",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2944,
+        896
+      ],
+      "id": "e9dd0c7a-6aa7-433c-b178-5ef203f286ce",
+      "name": "13b_Visita Cerrada",
+      "webhookId": "498a7744-fe98-4b92-b1c7-828d471b22d0",
+      "credentials": {
+        "telegramApi": {
+          "id": "zsEfatxtBaKa0n2X",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('01_Recibir Mensaje').item.json.message.chat.id }}",
+        "text": "=Hola {{$('01_Recibir Mensaje').item.json.message.from.first_name}}, \ndebes iniciar visita con el comando comando indicado para poder comenzar a registrar todo el contenido.\n",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2944,
+        1072
+      ],
+      "id": "54407224-ba17-459e-98d7-36d23ff163be",
+      "name": "13c_Solicitar Iniciar Visita",
+      "webhookId": "5cfc6c6f-1ebc-47cf-bce6-72ce0992b926",
+      "credentials": {
+        "telegramApi": {
+          "id": "zsEfatxtBaKa0n2X",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "9d797aca-fce8-4cdd-948c-435ddaca1926",
+              "leftValue": "={{ $json.Estado }}",
+              "rightValue": "activa",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1552,
+        432
+      ],
+      "id": "062703cc-0ad5-43cd-9638-48cae19cbf0b",
+      "name": "Activa o Cerrada"
+    },
+    {
+      "parameters": {
+        "jsCode": "function pick(o, path) { return path.split('.').reduce((acc, k) => (acc != null ? acc[k] : undefined), o); } function detectType({ json, binary }) { if (binary && Object.keys(binary).length) { const binKey = Object.keys(binary)[0]; const mime = binary[binKey]?.mimeType || ''; if (mime.startsWith('image/')) return 'imagen'; if (mime.startsWith('audio/')) return 'audio'; if (mime.startsWith('video/')) return 'video'; return 'documento'; } const msg = json?.message || json || {}; if (Array.isArray(msg.photo) && msg.photo.length) return 'imagen'; if (msg.sticker) return 'imagen'; if (msg.video || msg.video_note || msg.animation) return 'video'; if (msg.voice || msg.audio) return 'audio'; if (msg.document) { const mime = msg.document.mime_type || ''; const name = msg.document.file_name || ''; if (mime.startsWith('image/') || /\\.(png|jpe?g|gif|webp)$/i.test(name)) return 'imagen'; if (mime.startsWith('audio/') || /\\.(mp3|m4a|aac|ogg|wav|flac)$/i.test(name)) return 'audio'; if (mime.startsWith('video/') || /\\.(mp4|mov|mkv|webm)$/i.test(name)) return 'video'; return 'documento'; } const textLike = (typeof msg.text === 'string' && msg.text.trim() !== '') || (typeof msg.caption === 'string' && msg.caption.trim() !== '') || (typeof json?.text === 'string' && json.text.trim() !== ''); if (textLike) return 'texto'; const hasString = (v, d = 0) => { if (d > 5) return false; if (typeof v === 'string') return v.trim() !== ''; if (v && typeof v === 'object') return Object.values(v).some(x => hasString(x, d + 1)); return false; }; return hasString(json) ? 'texto' : 'documento'; } function getTimestamp(json) { const tsCandidates = ['message.date','date','timestamp','ts','datetime','createdAt','message.message_ts','event_ts','sent_at','received_at']; for (const k of tsCandidates) { const raw = pick(json, k); if (raw != null) return raw; } return Date.now(); } function toDate(raw) { if (typeof raw === 'number') return new Date(raw < 1e12 ? raw * 1000 : raw); const n = Number(raw); if (!Number.isNaN(n)) return new Date(n < 1e12 ? n * 1000 : n); return new Date(raw); } function fmtHora(d) { const hh = String(d.getHours()).padStart(2, '0'); const mm = String(d.getMinutes()).padStart(2, '0'); return `${hh}:${mm}`; } function fmtFecha(d) { const dd = String(d.getDate()).padStart(2, '0'); const mo = String(d.getMonth() + 1).padStart(2, '0'); const yy = String(d.getFullYear()).slice(-2); return `${dd}-${mo}-${yy}`; } function getChatId(json) { return pick(json, 'message.chat.id') ?? json?.chat?.id ?? null; } function getArquitecto(json) { const f = pick(json, 'message.from') ?? json?.from ?? {}; const first = f.first_name || ''; const last = f.last_name || ''; const full = `${first} ${last}`.trim(); return full || null; } function getObra(json) { return pick(json, 'message.chat.title') ?? json?.chat?.title ?? null; } const out = []; for (const item of $input.all()) { const json = item.json || {}; const tipo = detectType(item); const d = toDate(getTimestamp(json)); out.push({ ...item, json: { ...json, tipo, hora: fmtHora(d), chat_id: getChatId(json), arquitecto: getArquitecto(json), fecha: fmtFecha(d), obra: getObra(json), }, }); } return out;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        784,
+        224
+      ],
+      "id": "308e04df-8ab9-41ef-a2b7-0983af2cbf3c",
+      "name": "02_Añadir Datos"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1152,
+        16
+      ],
+      "id": "03f402e9-c044-4957-b0d1-ea9fc7fcef6b",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "08249e7a-35bc-4a7e-ac22-fa5b9048d717",
+              "leftValue": "={{ $json.message.text }}",
+              "rightValue": "/iniciar_visita",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1776,
+        784
+      ],
+      "id": "05e38243-afc8-45f9-86db-bec972c125ee",
+      "name": "Iniciar Visita"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.tipo }}",
+                    "rightValue": "texto",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "6de909c4-e4b9-4b1c-b908-c9d016ccf089"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "texto"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "ebd355ea-4d8d-4743-a444-942beae9d225",
+                    "leftValue": "={{ $json.tipo }}",
+                    "rightValue": "imagen",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "imagen"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "3662684a-d60f-49bd-b4b1-589c5e5b9bb4",
+                    "leftValue": "={{ $json.tipo }}",
+                    "rightValue": "audio",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "audio"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        2064,
+        384
+      ],
+      "id": "2dff451d-84ec-420e-a692-0f4571d74693",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "827f6cd0-cf96-4609-b511-35c8f9c0fbd7",
+              "leftValue": "={{ $json.message.text }}",
+              "rightValue": "/fin_visita",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2160,
+        944
+      ],
+      "id": "3a29b1c4-d614-45e5-8a35-6e9a6381afc3",
+      "name": "Cerrar Visita?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c0c402cb-c0f6-4adb-af9f-a9a10f76cbad",
+              "leftValue": "={{ $json.Estado }}",
+              "rightValue": "cerrada",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "dcbc704a-575f-462b-9c66-6df9e3895d31",
+              "leftValue": "={{ $('02_Añadir Datos').item.json.message.text }}",
+              "rightValue": "/fin_visita",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1360,
+        208
+      ],
+      "id": "664f46ec-5187-4cd7-9530-1a6feb01b61b",
+      "name": "Visita cerrada & Comando cerrar"
+    },
+    {
+      "parameters": {
+        "jsCode": "const allRows = $input.all();\n\n// Si no hay filas, retornar estructura vacía indicando que debe crear nueva\nif (allRows.length === 0) {\n  return [{\n    json: {\n      Estado: 'cerrada',\n      chatId: null,\n      Obra: null,\n      Fecha: null,\n      Arquitecto: null,\n      Hora_Inicio: null,\n      Id_Documento: null,\n      Id_Carpeta: null,\n      Hora_fin: null\n    }\n  }];\n}\n\n// Obtener la última fila\nconst ultimaFila = allRows[allRows.length - 1].json;\n\n// Retornar la última fila completa\nreturn [{\n  json: {\n    Estado: ultimaFila.Estado || 'cerrada',\n    chatId: ultimaFila.chatId || null,\n    Obra: ultimaFila.Obra || null,\n    Fecha: ultimaFila.Fecha || null,\n    Arquitecto: ultimaFila.Arquitecto || null,\n    Hora_Inicio: ultimaFila.Hora_Inicio || null,\n    Id_Documento: ultimaFila.Id_Documento || null,\n    Id_Carpeta: ultimaFila.Id_Carpeta || null,\n    Hora_fin: ultimaFila.Hora_fin || null\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        0
+      ],
+      "id": "e0b4536f-5fe5-480d-8703-232f79ccaa61",
+      "name": "Cojer ultima fila"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "19aktC1hWn0lzbkY9ZevMxzPf6yG6pZrfCDAlkPOC33k",
+          "mode": "list"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Hoja_1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19aktC1hWn0lzbkY9ZevMxzPf6yG6pZrfCDAlkPOC33k/edit#gid=0"
+        },
+        "options": {
+          "dataLocationOnSheet": {
+            "values": {
+              "rangeDefinition": "specifyRangeA1",
+              "range": "H1:H"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1968,
+        16
+      ],
+      "id": "40149ab4-ee0f-4df3-87b3-01e1f834bcd5",
+      "name": "ID Documento",
+      "retryOnFail": false,
+      "maxTries": 5,
+      "waitBetweenTries": 1500,
+      "notesInFlow": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "oayhnXmmc5zlNysm",
+          "name": "Google Sheets account"
+        }
+      },
+      "notes": "oken-bucket throttle universal para Google APIs."
+    },
+    {
+      "parameters": {
+        "jsCode": "return [$input.all().pop()];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2176,
+        16
+      ],
+      "id": "47010b37-679f-4f1d-a760-a98f7498b87c",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "19aktC1hWn0lzbkY9ZevMxzPf6yG6pZrfCDAlkPOC33k",
+          "mode": "list"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list"
+        },
+        "options": {
+          "dataLocationOnSheet": {
+            "values": {
+              "rangeDefinition": "specifyRangeA1",
+              "range": "I1:I"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2576,
+        624
+      ],
+      "id": "bc450689-0f06-4077-88f4-15d46a24acc4",
+      "name": "ID Documento1",
+      "retryOnFail": false,
+      "maxTries": 5,
+      "notesInFlow": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "oayhnXmmc5zlNysm",
+          "name": "Google Sheets account"
+        }
+      },
+      "notes": "oken-bucket throttle universal para Google APIs."
+    },
+    {
+      "parameters": {
+        "jsCode": "return [$input.all().pop()];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2736,
+        624
+      ],
+      "id": "14e09ff4-1a42-427c-9594-1ceeab0a465a",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2624,
+        32
+      ],
+      "id": "2c416671-0cd8-4557-b5c4-34d7d2103857",
+      "name": "Unir datos"
+    },
+    {
+      "parameters": {
+        "jsCode": "const TOKEN = items[0]?.json?.token || '8474743298:AAFXjG3yGbaRl1CAlH6eFwgBF40yqv0Zfg8'; async function getFilePath(fileId) { const meta = await this.helpers.request({ method: 'GET', url: `https://api.telegram.org/bot${TOKEN}/getFile`, qs: { file_id: fileId }, json: true, }); return meta?.result?.file_path; } async function downloadBuffer(filePath) { return this.helpers.request({ method: 'GET', url: `https://api.telegram.org/file/bot${TOKEN}/${filePath}`, encoding: null, }); } const out = []; for (const item of items) { const msg = item.json?.message || {}; const isAudioDoc = msg.document?.mime_type?.startsWith?.('audio/'); const fileId = msg.voice?.file_id || msg.audio?.file_id || (isAudioDoc ? msg.document.file_id : null); if (!fileId) { out.push(item); continue; } try { const filePath = await getFilePath.call(this, fileId); if (!filePath) throw new Error('Sin file_path'); const buf = await downloadBuffer.call(this, filePath); const name = filePath.split('/').pop() || `audio_${Date.now()}.oga`; const mime = msg.audio?.mime_type || msg.document?.mime_type || (name.endsWith('.mp3') ? 'audio/mpeg' : 'audio/ogg'); const bin = await this.helpers.prepareBinaryData(buf, name, mime); item.binary = item.binary || {}; item.binary.data = bin; item.json.fileName = name; item.json.mime_type = mime; } catch (e) { item.json.audio_download_error = e.message || String(e); } out.push(item); } return out;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        496,
+        224
+      ],
+      "id": "b6372cd3-aa5e-4b52-a3d7-1370987e9408",
+      "name": "Añadir audio - Binary"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0c4db273-85a2-4f36-923b-cfd2784a798a",
+              "leftValue": "={{ $json.message.text }}",
+              "rightValue": "/fin_visita",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1760,
+        416
+      ],
+      "id": "f157c885-653c-4497-bb13-1ab33270add2",
+      "name": "Fin visita?"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2880,
+        432
+      ],
+      "id": "46b2d0ca-cdf1-41cc-91a4-80676f4cb572",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Modo: Run Once for Each Item\nconst req = ['Id_Carpeta','Id_Documento','Obra','Arquitecto','Fecha','Hora_Inicio','Hora_fin','chatId'];\nconst missing = req.filter(k => !Object.prototype.hasOwnProperty.call($json, k));\nif (missing.length) {\n  throw new Error(`Faltan claves: ${missing.join(', ')}`);\n}\n\n// Fecha tipo \"3-11-25\" => dd-mm-yy\nconst [d, m, y] = String($json.Fecha).split('-').map(n => parseInt(n, 10));\nconst year = y < 100 ? 2000 + y : y;\n\n// ISO solo fecha\nconst fechaISO = new Date(Date.UTC(year, m - 1, d)).toISOString().slice(0, 10);\n\n// Si quieres datetimes también:\nfunction toISOdt(hhmm) {\n  const [hh, mm] = String(hhmm).split(':').map(n => parseInt(n,10));\n  return new Date(Date.UTC(year, m - 1, d, hh, mm)).toISOString();\n}\n\nreturn [{\n  json: {\n    ...$json,\n    FechaISO: fechaISO,\n    InicioISO: toISOdt($json.Hora_Inicio),\n    FinISO: toISOdt($json.Hora_fin)\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3424,
+        896
+      ],
+      "id": "4021dd61-ed0c-448c-ae4a-ad5e7dd1027e",
+      "name": "FechaVisitaISO"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('02_Añadir Datos').item.json.tipo }}",
+                    "rightValue": "audio",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    },
+                    "id": "a85bd33d-f558-45a0-8d4d-80c0146a6cf3"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "audio"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('02_Añadir Datos').item.json.tipo }}",
+                    "rightValue": "imagen",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "imagen"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('02_Añadir Datos').item.json.tipo }}",
+                    "rightValue": "texto",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "texto"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": 3
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        3840,
+        880
+      ],
+      "id": "73f81049-c553-408b-8c7a-72ffa8e55d74",
+      "name": "03_Decidir Tipo"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {
+          "language": "es"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        4816,
+        704
+      ],
+      "id": "e1712690-b866-49a5-be64-e4c5ea78c4a2",
+      "name": "04_Transcribir Audio",
+      "credentials": {
+        "openAiApi": {
+          "id": "qNH5eWMA7l00MprD",
+          "name": "OPENAI_actas"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "numberInputs": 3,
+        "options": {
+          "includeUnpaired": true
+        }
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        6576,
+        912
+      ],
+      "id": "04d9756c-5bb2-4bbd-89f4-9adbc145de4a",
+      "name": "08_Unir Entradas"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Normaliza TODO el contexto en un único item robusto para los agentes.\n// Produce: ctx_text, ctx_imgs[], ctx_audio[], descripciones_imagen, transcripciones_audio, y metadatos clave.\n\nconst items = $input.all();\n\n// 1) Metadatos\nconst meta = {};\nconst pickMeta = ['FolderID','DocBaseID','ObraNombre','ArquitectoNombre','FechaVisitaISO','ArquitectoEmail','emailMap'];\nfor (const it of items) {\n  const j = it?.json ?? {};\n  for (const k of pickMeta) {\n    if (meta[k] === undefined && j[k] !== undefined && j[k] !== null && j[k] !== '') {\n      meta[k] = j[k];\n    }\n  }\n}\nif (!meta.ArquitectoEmail) meta.ArquitectoEmail = 'automatizacionesgrau@gmail.com';\nif (!meta.emailMap) meta.emailMap = {};\n\n// 2) Texto base\nconst textParts = [];\nfor (const it of items) {\n  const j = it?.json ?? {};\n  for (const k of ['chat_texto','texto','texto_normalizado','acta_texto','text','mensaje']) {\n    if (typeof j[k] === 'string' && j[k].trim()) textParts.push(j[k].trim());\n  }\n}\nconst texto_normalizado = textParts.join('\\n').trim();\n\n// 3) Imágenes + descripciones\nfunction findImageBinary(b) {\n  if (!b) return null;\n  for (const k of Object.keys(b)) {\n    const v = b[k];\n    if (v && typeof v.mimeType === 'string' && v.mimeType.startsWith('image/')) {\n      return v;\n    }\n  }\n  return null;\n}\n\nconst imgs = [];\nfor (const it of items) {\n  const j = it?.json ?? {};\n  const bin = findImageBinary(it?.binary);\n  const fileId = j.fileId ?? j.id ?? (bin?.fileId ?? null);\n  const name = bin?.fileName ?? j.name ?? null;\n  const mimeType = bin?.mimeType ?? j.mimeType ?? null;\n  // La descripción puede venir ya parseada o en crudo; tomamos lo mejor disponible\n  const desc = String(\n    j.descripcion ?? j.description ?? j.output_text ?? j.content ?? ''\n  ).trim();\n\n  if (fileId || name || desc) {\n    imgs.push({ fileId, name, mimeType, caption: desc || '' });\n  }\n}\n\n// fallback desde pre-agrupadores\nif (!imgs.length) {\n  for (const it of items) {\n    const arr = it?.json?.__imagenes_all;\n    if (Array.isArray(arr) && arr.length) { imgs.push(...arr); break; }\n  }\n}\n\nconst imgs_md = imgs\n  .map(x => `[[IMG:${x.fileId || x.name || 'unknown'}|${x.caption || ''}]]`)\n  .join('\\n');\n\n// 4) Audios + transcripciones\nfunction findAudioBinary(b) {\n  if (!b) return null;\n  for (const k of Object.keys(b)) {\n    const v = b[k];\n    if (v && typeof v.mimeType === 'string' && v.mimeType.startsWith('audio/')) {\n      return v;\n    }\n  }\n  return null;\n}\n\nconst auds = [];\nlet aidx = 0;\nfor (const it of items) {\n  const j = it?.json ?? {};\n  const bin = findAudioBinary(it?.binary);\n  const nombre = j.name ?? bin?.fileName ?? `audio_${++aidx}`;\n  const texto = String(j.text ?? j.transcript ?? j.transcription ?? j.audio_text ?? '').trim();\n  const dur = Number.isFinite(j.duration) ? j.duration : (Number.isFinite(bin?.duration) ? bin.duration : null);\n  if (nombre || texto) auds.push({ name: nombre, duracion_seg: dur ?? null, texto });\n}\n\n// fallback desde pre-agrupadores\nif (!auds.length) {\n  for (const it of items) {\n    const arr = it?.json?.__audios_all;\n    if (Array.isArray(arr) && arr.length) { auds.push(...arr); break; }\n  }\n}\n\nconst audios_md = auds\n  .map(a => `- ${a.name}: ${a.texto ? a.texto.slice(0,200) : '—'}`)\n  .join('\\n');\n\n// 5) Salida única\nreturn [{\n  json: {\n    ctx_text: texto_normalizado,\n    ctx_imgs: imgs,\n    ctx_audio: auds,\n    descripciones_imagen: imgs_md,\n    transcripciones_audio: audios_md,\n    FolderID: meta.FolderID ?? null,\n    DocBaseID: meta.DocBaseID ?? null,\n    ObraNombre: meta.ObraNombre ?? null,\n    ArquitectoNombre: meta.ArquitectoNombre ?? null,\n    FechaVisitaISO: meta.FechaVisitaISO ?? null,\n    ArquitectoEmail: meta.ArquitectoEmail,\n    emailMap: meta.emailMap\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        6784,
+        928
+      ],
+      "id": "2b16ecc5-677e-4540-8776-6b043638ed17",
+      "name": "09_Normalizar Texto"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "Eres un compositor de ACTAS de visita de obra. Devuelves SOLO JSON válido, sin texto extra, sin Markdown.\n\nEsquema de salida (un único objeto):\n{\n  \"obra\": \"string|null\",\n  \"arquitecto\": \"string|null\",\n  \"fecha_inicio\": \"string|null\",  // ISO yyyy-mm-dd o null\n  \"fecha_fin\": \"string|null\",     // ISO yyyy-mm-dd o null\n  \"asistentes\": [\"string\"],\n  \"resumen_ejecutivo\": \"string\",\n  \"bloques\": [\n    {\"tipo\":\"h1\",\"text\":\"string\"},\n    {\"tipo\":\"h2\",\"text\":\"string\"},\n    {\"tipo\":\"p\",\"text\":\"string\"},\n    {\"tipo\":\"img\",\"marker\":\"[[IMG:<fileId>|<caption>]]\"}\n  ]\n}\n\nReglas:\n- Salida: exactamente un objeto JSON que cumpla el esquema. Nada de prosa fuera del JSON.\n- Español neutro, formal y conciso.\n- Máxima claridad y coherencia. Divide en secciones lógicas (h1, h2, p). Referencia el origen en paréntesis cuando aporte contexto (p. ej., “(audio_3)”).\n- Imágenes: si hay imágenes relevantes en ctx_imgs, inserta bloques {\"tipo\":\"img\",\"marker\":\"[[IMG:fileId|caption]]\"}:\n  - Usa fileId si existe; si no, usa name.\n  - caption breve y descriptiva (máx. 12 palabras).\n  - No inventes imágenes.\n- Mapeo OBLIGATORIO desde el contexto:\n  - obra = $json.ObraNombre || null\n  - arquitecto = $json.ArquitectoNombre || null\n  - fecha_inicio = $json.FechaVisitaISO || null\n  - fecha_fin = null salvo que el contexto indique lo contrario en formato ISO\n  - No escribas “no especificado” en ningún campo; usa null.\n- Asistentes: incluye solo si son deducibles con alta confianza a partir de ctx_text/ctx_audio/metadatos; si no, [].\n- Fechas: si hay menciones relativas (“lunes 20 de octubre”) sin año fiable, deja null.\n- Limpieza de entrada: ignora valores vacíos, “—” y cadenas “no especificado”.\n- No añadas claves fuera del esquema. No devuelvas arrays/objetos vacíos si no aplican (usa [] o null según el esquema).\n- “resumen_ejecutivo”: 60–120 palabras, abarcando los puntos críticos.\n\nCumple estrictamente el esquema. Devuelve SOLO el objeto JSON.",
+              "role": "system"
+            },
+            {
+              "content": "=Contexto de la visita (normalizado):\n- obra = {{ $json.ObraNombre || null }}\n- arquitecto = {{ $json.ArquitectoNombre || null }}\n- fecha_inicio = {{ $json.FechaVisitaISO || null }}\n- fecha_fin = null (salvo indicación explícita en ISO yyyy-mm-dd)\n- ArquitectoEmail = {{ $json.ArquitectoEmail || null }}\n\nTexto unificado:\n{{ $json.ctx_text || \"\" }}\n\nTranscripciones de audio (array de objetos):\n{{ JSON.stringify($json.ctx_audio || []) }}\n// Formato esperado: [{ \"name\":\"audio_1\", \"texto\":\"...\" }, ...]\n\nImágenes disponibles (array):\n{{ JSON.stringify($json.ctx_imgs || []) }}\n// Formato esperado: [{ \"fileId\":\"...\", \"name\":\"...\", \"caption\":\"...\" }]\n\nMetadatos:\n{{ $json.metadatos || \"{}\" }}\n\nInstrucciones:\n- Ignora “no especificado” y “—”.\n- Usa imágenes solo si aportan contexto.\n- Referencia audios como (audio_N) si aplican.\n- Devuelve SOLO el objeto JSON del acta conforme al esquema y reglas del sistema."
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "frequency_penalty": 0,
+          "maxTokens": 3500,
+          "n": 1,
+          "presence_penalty": 0,
+          "temperature": 0.2,
+          "topP": 1,
+          "maxToolsIterations": 15
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        7344,
+        928
+      ],
+      "id": "bcad83b0-3b6e-4c63-bcfd-59772d9356f8",
+      "name": "10_Generar Acta",
+      "credentials": {
+        "openAiApi": {
+          "id": "qNH5eWMA7l00MprD",
+          "name": "OPENAI_actas"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "folderId": "={{ $('09_Normalizar Texto').item.json.FolderID }}",
+        "title": "=Acta Final - {{ $('09_Normalizar Texto').item.json.ObraNombre }}"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        8016,
+        736
+      ],
+      "id": "9e68504e-1296-41a7-a75e-82e3df917ce1",
+      "name": "12_Crear Acta Doc",
+      "retryOnFail": true,
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "8E62v5jsiektAUOd",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "folderId": "={{ $('09_Normalizar Texto').item.json.FolderID }}",
+        "title": "=Tareas - {{ $('09_Normalizar Texto').item.json.ObraNombre }}"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        9536,
+        1552
+      ],
+      "id": "1afe8382-d3bf-4dd5-b206-afb245cbcc65",
+      "name": "14_Crear ToDo Doc",
+      "retryOnFail": true,
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "8E62v5jsiektAUOd",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ $json.docTareasId || $json.id || $('14_Crear ToDo Doc').item.json.id }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insert",
+              "text": "={{ String($json.texto_tareas || '—') }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        9952,
+        1552
+      ],
+      "id": "f9ebf55f-8939-499b-beeb-92bbf4397122",
+      "name": "15_Actualizar ToDo",
+      "retryOnFail": true,
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "8E62v5jsiektAUOd",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.__gmail_to }}",
+        "subject": "={{ $json.__gmail_subject }}",
+        "message": "={{ $json.__gmail_body }}",
+        "options": {
+          "appendAttribution": false,
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {
+                "property": "acta_pdf"
+              },
+              {
+                "property": "tareas_pdf"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        12112,
+        928
+      ],
+      "id": "22df3222-c16d-4db4-a91c-46b97eea2fb9",
+      "name": "17_Enviar Correo",
+      "webhookId": "7fc33229-1470-4840-99b5-7e9863adce90",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "adznxc4ZUNItDwhJ",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "19aktC1hWn0lzbkY9ZevMxzPf6yG6pZrfCDAlkPOC33k",
+          "mode": "list"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Obra",
+              "lookupValue": "={{ $json.result.chat.title }}"
+            },
+            {
+              "lookupColumn": "chatId",
+              "lookupValue": "={{ $json.result.chat.id }}"
+            }
+          ]
+        },
+        "options": {
+          "returnFirstMatch": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3136,
+        896
+      ],
+      "id": "d6d66197-610d-4c77-9d07-5f20c3193b92",
+      "name": "Indice Datos Visita",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "oayhnXmmc5zlNysm",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{$json.id}}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        4544,
+        704
+      ],
+      "id": "570b6d61-8078-40df-98e7-62d4b0ef887e",
+      "name": "Descargar Audio",
+      "retryOnFail": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "vwcZPpkJ3FGQ2goC",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "65cf6b0c-2a4d-4da8-87d6-a4fb4c23a0b6",
+              "name": "FolderID",
+              "value": "={{$json.Id_Carpeta}}",
+              "type": "string"
+            },
+            {
+              "id": "184831e5-6d8c-4443-ba91-d2bdf807c654",
+              "name": "ChatId",
+              "value": "={{ $('01_Recibir Mensaje').item.json.message.chat.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3616,
+        976
+      ],
+      "id": "f7a2755e-01bf-4a5b-ad55-90fd44323084",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "searchMethod": "query",
+        "queryString": "='{{ $json.Id_Carpeta }}' in parents and trashed = false and mimeType contains 'audio/'",
+        "returnAll": true,
+        "filter": {
+          "driveId": {
+            "mode": "list",
+            "value": "My Drive"
+          }
+        },
+        "options": {
+          "fields": [
+            "*"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        4272,
+        704
+      ],
+      "id": "c06b5a01-a84b-41c0-aa0f-b6272b470842",
+      "name": "Buscar Audio",
+      "retryOnFail": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "vwcZPpkJ3FGQ2goC",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "searchMethod": "query",
+        "queryString": "='{{ $json.Id_Carpeta }}' in parents and trashed = false and mimeType contains 'image/'\n",
+        "returnAll": true,
+        "filter": {
+          "driveId": {
+            "mode": "list",
+            "value": "My Drive"
+          }
+        },
+        "options": {
+          "fields": [
+            "*"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        4256,
+        912
+      ],
+      "id": "e0cc4ab8-314a-475a-ab88-97695567341c",
+      "name": "Buscar Imagenes",
+      "retryOnFail": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "vwcZPpkJ3FGQ2goC",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {
+          "includeUnpaired": true
+        }
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        4096,
+        912
+      ],
+      "id": "95c93d0a-c0ca-45b2-b210-52efbc9a0f96",
+      "name": "Unir Datos Imagen"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{$json.id}}",
+          "mode": "id"
+        },
+        "options": {
+          "binaryPropertyName": "data"
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        4400,
+        1040
+      ],
+      "id": "9a7d3074-585e-4796-ac31-f2e55321e9f4",
+      "name": "Descargar Imagenes",
+      "retryOnFail": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "vwcZPpkJ3FGQ2goC",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "searchMethod": "query",
+        "queryString": "='{{ $json.Id_Documento }}' in parents and trashed = false and mimeType = 'application/vnd.google-apps.document'\n",
+        "returnAll": true,
+        "filter": {},
+        "options": {
+          "fields": [
+            "*"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        4272,
+        1312
+      ],
+      "id": "e66c21be-57cc-466d-8ee2-14b3a18fdfe5",
+      "name": "Buscar Documento Texto",
+      "retryOnFail": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "vwcZPpkJ3FGQ2goC",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {
+          "includeUnpaired": true
+        }
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        4080,
+        1312
+      ],
+      "id": "7c01057a-192c-4e2c-bc00-b28dc0ba03f6",
+      "name": "Unir Datos Texto"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{$json.id}}",
+          "mode": "id"
+        },
+        "options": {
+          "binaryPropertyName": "data",
+          "googleFileConversion": {
+            "conversion": {
+              "docsToFormat": "text/plain"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        4544,
+        1312
+      ],
+      "id": "9175e664-2682-4b6e-953c-fc0d704e22c1",
+      "name": "Descargar Texto",
+      "retryOnFail": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "vwcZPpkJ3FGQ2goC",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "text",
+        "destinationKey": "text",
+        "options": {
+          "encoding": "utf8",
+          "stripBOM": true
+        }
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        4816,
+        1312
+      ],
+      "id": "f862f5e5-446f-42e6-9237-6857ac0868b6",
+      "name": "Extraer Texto del Doc"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        3152,
+        1072
+      ],
+      "id": "e939ce09-1a40-443d-b988-3be6348c7ea7",
+      "name": "Final de trayecto"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        3152,
+        1248
+      ],
+      "id": "3bf79742-78c7-4f24-ac1e-60f4a5a505b2",
+      "name": "Final de trayecto1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        3296,
+        432
+      ],
+      "id": "2971c47e-1dfa-4980-b9f8-9ca2ccd5b766",
+      "name": "Final de trayecto2"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        3168,
+        32
+      ],
+      "id": "04345091-97ae-4cd3-9a3e-89d5f7afa25a",
+      "name": "Final de trayecto3"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {
+          "includeUnpaired": true
+        }
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        4064,
+        704
+      ],
+      "id": "7080e70a-8ced-4740-92ce-7035c778d48f",
+      "name": "Unir Datos Audio"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "text": "Devuelve SOLO este JSON válido:\n{\"descripcion\": \"texto técnico conciso\"}\nSin backticks ni texto extra. Máximo 800 caracteres.\n",
+        "inputType": "binary",
+        "options": {
+          "maxOutputTokens": 400
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        5680,
+        1056
+      ],
+      "id": "29c58351-1159-41dd-94c8-7ff85f2a2069",
+      "name": "Analyze an image",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "maxTries": 5,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "dYWIJHglv4o7C5GD",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3552,
+        1472
+      ],
+      "id": "005a43af-8e97-4ce0-a568-2ceba8da2428",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Normaliza a [{json:{...}}]\nreturn items.map(i => ('json' in i) ? i : { json: i });\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3760,
+        1472
+      ],
+      "id": "27750118-b2dd-4469-90ec-30e0d45c6c37",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"nodes\": [\n    {\n      \"parameters\": {\n        \"values\": {\n          \"string\": [\n            { \"name\": \"throttleKey\", \"value\": \"google:all\" }\n          ],\n          \"number\": [\n            { \"name\": \"rpm\", \"value\": 15 },\n            { \"name\": \"capacity\", \"value\": 1 },\n            { \"name\": \"jitterMs\", \"value\": 250 }\n          ]\n        },\n        \"options\": {\n          \"dotNotation\": false\n        }\n      },\n      \"id\": \"ThrottleConfigGoogleUniversal\",\n      \"name\": \"Throttle Config (Google Universal)\",\n      \"type\": \"n8n-nodes-base.set\",\n      \"typeVersion\": 2,\n      \"position\": [520, 300],\n      \"notes\": \"Preset universal para Google APIs (Sheets/Drive/Docs): rpm=15, capacity=1, jitter=250.\",\n      \"notesInFlow\": true,\n      \"continueOnFail\": false,\n      \"retryOnFail\": false,\n      \"alwaysOutputData\": false,\n      \"executeOnce\": false,\n      \"onError\": \"stopWorkflow\"\n    }\n  ],\n  \"connections\": {}\n}\n",
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1424,
+        16
+      ],
+      "id": "26bdc8ae-576d-4373-9edb-7c0b0cb47615",
+      "name": "Throttle Config",
+      "notesInFlow": true,
+      "notes": "Preset throttle universal Google (rpm=30, cap=3, jitter=250)"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// UniversalThrottle TB — IA — Run Once for Each Item\nconst key       = $json.throttleKey ?? 'ai:gemini';\nconst rpm       = Number($json.rpm ?? 6);      // llamadas por minuto\nconst capacity  = Number($json.capacity ?? 1); // ráfaga mínima\nconst jitterMax = Number($json.jitterMs ?? 400);\n\nconst store = (globalThis.__tbGlobal = globalThis.__tbGlobal || { __tb: {} });\nfunction sleep(ms){ return new Promise(r => setTimeout(r, ms)); }\n\nlet b = store.__tb[key];\nconst now = Date.now();\nconst rate = rpm / 60000;\n\nif (!b) b = { tokens: capacity, last: now };\nelse {\n  const elapsed = now - b.last;\n  b.tokens = Math.min(capacity, b.tokens + elapsed * rate);\n  b.last = now;\n}\n\nlet waitedMs = 0;\nif (b.tokens < 1) {\n  const need = 1 - b.tokens;\n  const wait = Math.ceil(need / rate) + Math.floor(Math.random() * jitterMax);\n  await sleep(wait);\n  waitedMs = wait;\n  const t = Date.now();\n  const el2 = t - b.last;\n  b.tokens = Math.min(capacity, b.tokens + el2 * rate);\n  b.last = t;\n}\n\nb.tokens = Math.max(0, b.tokens - 1);\nstore.__tb[key] = b;\n\n// Devolver SIEMPRE el item\nconst item = $input.item;\nitem.json.__aiThrottle = { key, rpm, capacity, waitedMs, tokensRemain: Number(b.tokens.toFixed(2)) };\nreturn item;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1632,
+        16
+      ],
+      "id": "b52691fa-9c18-4f36-b8fe-0bb923153fd3",
+      "name": "UniversalThrottle TB",
+      "notesInFlow": true,
+      "notes": "Token-bucket throttle. Usa throttleKey/rpm/capacity/jitterMs del Set."
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"nodes\": [\n    {\n      \"parameters\": {\n        \"values\": {\n          \"string\": [\n            { \"name\": \"throttleKey\", \"value\": \"google:all\" }\n          ],\n          \"number\": [\n            { \"name\": \"rpm\", \"value\": 15 },\n            { \"name\": \"capacity\", \"value\": 1 },\n            { \"name\": \"jitterMs\", \"value\": 250 }\n          ]\n        },\n        \"options\": {\n          \"dotNotation\": false\n        }\n      },\n      \"id\": \"ThrottleConfigGoogleUniversal\",\n      \"name\": \"Throttle Config (Google Universal)\",\n      \"type\": \"n8n-nodes-base.set\",\n      \"typeVersion\": 2,\n      \"position\": [520, 300],\n      \"notes\": \"Preset universal para Google APIs (Sheets/Drive/Docs): rpm=15, capacity=1, jitter=250.\",\n      \"notesInFlow\": true,\n      \"continueOnFail\": false,\n      \"retryOnFail\": false,\n      \"alwaysOutputData\": false,\n      \"executeOnce\": false,\n      \"onError\": \"stopWorkflow\"\n    }\n  ],\n  \"connections\": {}\n}\n",
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        176,
+        16
+      ],
+      "id": "381fba82-22cf-42b1-b79e-cd4d3253e8d9",
+      "name": "Throttle Config1",
+      "notesInFlow": true,
+      "notes": "Preset throttle universal Google (rpm=30, cap=3, jitter=250)"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// UniversalThrottle TB — IA — Run Once for Each Item\nconst key       = $json.throttleKey ?? 'ai:gemini';\nconst rpm       = Number($json.rpm ?? 6);      // llamadas por minuto\nconst capacity  = Number($json.capacity ?? 1); // ráfaga mínima\nconst jitterMax = Number($json.jitterMs ?? 400);\n\nconst store = (globalThis.__tbGlobal = globalThis.__tbGlobal || { __tb: {} });\nfunction sleep(ms){ return new Promise(r => setTimeout(r, ms)); }\n\nlet b = store.__tb[key];\nconst now = Date.now();\nconst rate = rpm / 60000;\n\nif (!b) b = { tokens: capacity, last: now };\nelse {\n  const elapsed = now - b.last;\n  b.tokens = Math.min(capacity, b.tokens + elapsed * rate);\n  b.last = now;\n}\n\nlet waitedMs = 0;\nif (b.tokens < 1) {\n  const need = 1 - b.tokens;\n  const wait = Math.ceil(need / rate) + Math.floor(Math.random() * jitterMax);\n  await sleep(wait);\n  waitedMs = wait;\n  const t = Date.now();\n  const el2 = t - b.last;\n  b.tokens = Math.min(capacity, b.tokens + el2 * rate);\n  b.last = t;\n}\n\nb.tokens = Math.max(0, b.tokens - 1);\nstore.__tb[key] = b;\n\n// Devolver SIEMPRE el item\nconst item = $input.item;\nitem.json.__aiThrottle = { key, rpm, capacity, waitedMs, tokensRemain: Number(b.tokens.toFixed(2)) };\nreturn item;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        384,
+        16
+      ],
+      "id": "e7cfc2c8-089e-4cd9-b8f6-44aac6f6b849",
+      "name": "UniversalThrottle TB1",
+      "notesInFlow": true,
+      "notes": "Token-bucket throttle. Usa throttleKey/rpm/capacity/jitterMs del Set."
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"nodes\": [\n    {\n      \"parameters\": {\n        \"values\": {\n          \"string\": [\n            { \"name\": \"throttleKey\", \"value\": \"google:all\" }\n          ],\n          \"number\": [\n            { \"name\": \"rpm\", \"value\": 15 },\n            { \"name\": \"capacity\", \"value\": 1 },\n            { \"name\": \"jitterMs\", \"value\": 250 }\n          ]\n        },\n        \"options\": {\n          \"dotNotation\": false\n        }\n      },\n      \"id\": \"ThrottleConfigGoogleUniversal\",\n      \"name\": \"Throttle Config (Google Universal)\",\n      \"type\": \"n8n-nodes-base.set\",\n      \"typeVersion\": 2,\n      \"position\": [520, 300],\n      \"notes\": \"Preset universal para Google APIs (Sheets/Drive/Docs): rpm=15, capacity=1, jitter=250.\",\n      \"notesInFlow\": true,\n      \"continueOnFail\": false,\n      \"retryOnFail\": false,\n      \"alwaysOutputData\": false,\n      \"executeOnce\": false,\n      \"onError\": \"stopWorkflow\"\n    }\n  ],\n  \"connections\": {}\n}\n",
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2192,
+        624
+      ],
+      "id": "955245e0-23a2-4997-b86d-78d0447fc72c",
+      "name": "Throttle Config2",
+      "notesInFlow": true,
+      "notes": "Preset throttle universal Google (rpm=30, cap=3, jitter=250)"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// UniversalThrottle TB — IA — Run Once for Each Item\nconst key       = $json.throttleKey ?? 'ai:gemini';\nconst rpm       = Number($json.rpm ?? 6);      // llamadas por minuto\nconst capacity  = Number($json.capacity ?? 1); // ráfaga mínima\nconst jitterMax = Number($json.jitterMs ?? 400);\n\nconst store = (globalThis.__tbGlobal = globalThis.__tbGlobal || { __tb: {} });\nfunction sleep(ms){ return new Promise(r => setTimeout(r, ms)); }\n\nlet b = store.__tb[key];\nconst now = Date.now();\nconst rate = rpm / 60000;\n\nif (!b) b = { tokens: capacity, last: now };\nelse {\n  const elapsed = now - b.last;\n  b.tokens = Math.min(capacity, b.tokens + elapsed * rate);\n  b.last = now;\n}\n\nlet waitedMs = 0;\nif (b.tokens < 1) {\n  const need = 1 - b.tokens;\n  const wait = Math.ceil(need / rate) + Math.floor(Math.random() * jitterMax);\n  await sleep(wait);\n  waitedMs = wait;\n  const t = Date.now();\n  const el2 = t - b.last;\n  b.tokens = Math.min(capacity, b.tokens + el2 * rate);\n  b.last = t;\n}\n\nb.tokens = Math.max(0, b.tokens - 1);\nstore.__tb[key] = b;\n\n// Devolver SIEMPRE el item\nconst item = $input.item;\nitem.json.__aiThrottle = { key, rpm, capacity, waitedMs, tokensRemain: Number(b.tokens.toFixed(2)) };\nreturn item;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2400,
+        624
+      ],
+      "id": "225f6eb8-ef80-45c0-b9aa-1680f52a9ffe",
+      "name": "UniversalThrottle TB2",
+      "notesInFlow": true,
+      "notes": "Token-bucket throttle. Usa throttleKey/rpm/capacity/jitterMs del Set."
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"nodes\": [\n    {\n      \"parameters\": {\n        \"values\": {\n          \"string\": [\n            { \"name\": \"throttleKey\", \"value\": \"google:all\" }\n          ],\n          \"number\": [\n            { \"name\": \"rpm\", \"value\": 15 },\n            { \"name\": \"capacity\", \"value\": 1 },\n            { \"name\": \"jitterMs\", \"value\": 250 }\n          ]\n        },\n        \"options\": {\n          \"dotNotation\": false\n        }\n      },\n      \"id\": \"ThrottleConfigGoogleUniversal\",\n      \"name\": \"Throttle Config (Google Universal)\",\n      \"type\": \"n8n-nodes-base.set\",\n      \"typeVersion\": 2,\n      \"position\": [520, 300],\n      \"notes\": \"Preset universal para Google APIs (Sheets/Drive/Docs): rpm=15, capacity=1, jitter=250.\",\n      \"notesInFlow\": true,\n      \"continueOnFail\": false,\n      \"retryOnFail\": false,\n      \"alwaysOutputData\": false,\n      \"executeOnce\": false,\n      \"onError\": \"stopWorkflow\"\n    }\n  ],\n  \"connections\": {}\n}\n",
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2368,
+        896
+      ],
+      "id": "fbd178f6-f900-4f05-8458-31459539b2b5",
+      "name": "Throttle Config3",
+      "notesInFlow": true,
+      "notes": "Preset throttle universal Google (rpm=30, cap=3, jitter=250)"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// UniversalThrottle TB — IA — Run Once for Each Item\nconst key       = $json.throttleKey ?? 'ai:gemini';\nconst rpm       = Number($json.rpm ?? 6);      // llamadas por minuto\nconst capacity  = Number($json.capacity ?? 1); // ráfaga mínima\nconst jitterMax = Number($json.jitterMs ?? 400);\n\nconst store = (globalThis.__tbGlobal = globalThis.__tbGlobal || { __tb: {} });\nfunction sleep(ms){ return new Promise(r => setTimeout(r, ms)); }\n\nlet b = store.__tb[key];\nconst now = Date.now();\nconst rate = rpm / 60000;\n\nif (!b) b = { tokens: capacity, last: now };\nelse {\n  const elapsed = now - b.last;\n  b.tokens = Math.min(capacity, b.tokens + elapsed * rate);\n  b.last = now;\n}\n\nlet waitedMs = 0;\nif (b.tokens < 1) {\n  const need = 1 - b.tokens;\n  const wait = Math.ceil(need / rate) + Math.floor(Math.random() * jitterMax);\n  await sleep(wait);\n  waitedMs = wait;\n  const t = Date.now();\n  const el2 = t - b.last;\n  b.tokens = Math.min(capacity, b.tokens + el2 * rate);\n  b.last = t;\n}\n\nb.tokens = Math.max(0, b.tokens - 1);\nstore.__tb[key] = b;\n\n// Devolver SIEMPRE el item\nconst item = $input.item;\nitem.json.__aiThrottle = { key, rpm, capacity, waitedMs, tokensRemain: Number(b.tokens.toFixed(2)) };\nreturn item;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2560,
+        896
+      ],
+      "id": "32cf8e46-430c-4e80-96a1-b0ecd47c0607",
+      "name": "UniversalThrottle TB3",
+      "notesInFlow": true,
+      "notes": "Token-bucket throttle. Usa throttleKey/rpm/capacity/jitterMs del Set."
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"nodes\": [\n    {\n      \"parameters\": {\n        \"values\": {\n          \"string\": [\n            { \"name\": \"throttleKey\", \"value\": \"google:all\" }\n          ],\n          \"number\": [\n            { \"name\": \"rpm\", \"value\": 15 },\n            { \"name\": \"capacity\", \"value\": 1 },\n            { \"name\": \"jitterMs\", \"value\": 250 }\n          ]\n        },\n        \"options\": {\n          \"dotNotation\": false\n        }\n      },\n      \"id\": \"ThrottleConfigGoogleUniversal\",\n      \"name\": \"Throttle Config (Google Universal)\",\n      \"type\": \"n8n-nodes-base.set\",\n      \"typeVersion\": 2,\n      \"position\": [520, 300],\n      \"notes\": \"Preset universal para Google APIs (Sheets/Drive/Docs): rpm=15, capacity=1, jitter=250.\",\n      \"notesInFlow\": true,\n      \"continueOnFail\": false,\n      \"retryOnFail\": false,\n      \"alwaysOutputData\": false,\n      \"executeOnce\": false,\n      \"onError\": \"stopWorkflow\"\n    }\n  ],\n  \"connections\": {}\n}\n",
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2736,
+        1504
+      ],
+      "id": "c7f980e7-2175-454e-91d7-9983c7e08475",
+      "name": "Throttle Config4",
+      "notesInFlow": true,
+      "notes": "Preset throttle universal Google (rpm=30, cap=3, jitter=250)"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// UniversalThrottle TB — IA — Run Once for Each Item\nconst key       = $json.throttleKey ?? 'ai:gemini';\nconst rpm       = Number($json.rpm ?? 6);      // llamadas por minuto\nconst capacity  = Number($json.capacity ?? 1); // ráfaga mínima\nconst jitterMax = Number($json.jitterMs ?? 400);\n\nconst store = (globalThis.__tbGlobal = globalThis.__tbGlobal || { __tb: {} });\nfunction sleep(ms){ return new Promise(r => setTimeout(r, ms)); }\n\nlet b = store.__tb[key];\nconst now = Date.now();\nconst rate = rpm / 60000;\n\nif (!b) b = { tokens: capacity, last: now };\nelse {\n  const elapsed = now - b.last;\n  b.tokens = Math.min(capacity, b.tokens + elapsed * rate);\n  b.last = now;\n}\n\nlet waitedMs = 0;\nif (b.tokens < 1) {\n  const need = 1 - b.tokens;\n  const wait = Math.ceil(need / rate) + Math.floor(Math.random() * jitterMax);\n  await sleep(wait);\n  waitedMs = wait;\n  const t = Date.now();\n  const el2 = t - b.last;\n  b.tokens = Math.min(capacity, b.tokens + el2 * rate);\n  b.last = t;\n}\n\nb.tokens = Math.max(0, b.tokens - 1);\nstore.__tb[key] = b;\n\n// Devolver SIEMPRE el item\nconst item = $input.item;\nitem.json.__aiThrottle = { key, rpm, capacity, waitedMs, tokensRemain: Number(b.tokens.toFixed(2)) };\nreturn item;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2928,
+        1504
+      ],
+      "id": "1791392b-29ed-4bd6-b4fb-a4659041f761",
+      "name": "UniversalThrottle TB4",
+      "notesInFlow": true,
+      "notes": "Token-bucket throttle. Usa throttleKey/rpm/capacity/jitterMs del Set."
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"nodes\": [\n    {\n      \"parameters\": {\n        \"values\": {\n          \"string\": [\n            { \"name\": \"throttleKey\", \"value\": \"google:all\" }\n          ],\n          \"number\": [\n            { \"name\": \"rpm\", \"value\": 15 },\n            { \"name\": \"capacity\", \"value\": 1 },\n            { \"name\": \"jitterMs\", \"value\": 250 }\n          ]\n        },\n        \"options\": {\n          \"dotNotation\": false\n        }\n      },\n      \"id\": \"ThrottleConfigGoogleUniversal\",\n      \"name\": \"Throttle Config (Google Universal)\",\n      \"type\": \"n8n-nodes-base.set\",\n      \"typeVersion\": 2,\n      \"position\": [520, 300],\n      \"notes\": \"Preset universal para Google APIs (Sheets/Drive/Docs): rpm=15, capacity=1, jitter=250.\",\n      \"notesInFlow\": true,\n      \"continueOnFail\": false,\n      \"retryOnFail\": false,\n      \"alwaysOutputData\": false,\n      \"executeOnce\": false,\n      \"onError\": \"stopWorkflow\"\n    }\n  ],\n  \"connections\": {}\n}\n",
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2208,
+        1248
+      ],
+      "id": "0fa223fa-800c-4244-a371-c56b8c2f8789",
+      "name": "Throttle Config5",
+      "notesInFlow": true,
+      "notes": "Preset throttle universal Google (rpm=30, cap=3, jitter=250)"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// UniversalThrottle TB — IA — Run Once for Each Item\nconst key       = $json.throttleKey ?? 'ai:gemini';\nconst rpm       = Number($json.rpm ?? 6);      // llamadas por minuto\nconst capacity  = Number($json.capacity ?? 1); // ráfaga mínima\nconst jitterMax = Number($json.jitterMs ?? 400);\n\nconst store = (globalThis.__tbGlobal = globalThis.__tbGlobal || { __tb: {} });\nfunction sleep(ms){ return new Promise(r => setTimeout(r, ms)); }\n\nlet b = store.__tb[key];\nconst now = Date.now();\nconst rate = rpm / 60000;\n\nif (!b) b = { tokens: capacity, last: now };\nelse {\n  const elapsed = now - b.last;\n  b.tokens = Math.min(capacity, b.tokens + elapsed * rate);\n  b.last = now;\n}\n\nlet waitedMs = 0;\nif (b.tokens < 1) {\n  const need = 1 - b.tokens;\n  const wait = Math.ceil(need / rate) + Math.floor(Math.random() * jitterMax);\n  await sleep(wait);\n  waitedMs = wait;\n  const t = Date.now();\n  const el2 = t - b.last;\n  b.tokens = Math.min(capacity, b.tokens + el2 * rate);\n  b.last = t;\n}\n\nb.tokens = Math.max(0, b.tokens - 1);\nstore.__tb[key] = b;\n\n// Devolver SIEMPRE el item\nconst item = $input.item;\nitem.json.__aiThrottle = { key, rpm, capacity, waitedMs, tokensRemain: Number(b.tokens.toFixed(2)) };\nreturn item;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2400,
+        1248
+      ],
+      "id": "5fe99c43-c344-460d-876c-f6c211f29e66",
+      "name": "UniversalThrottle TB5",
+      "notesInFlow": true,
+      "notes": "Token-bucket throttle. Usa throttleKey/rpm/capacity/jitterMs del Set."
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "function extractText(j) {\n  if (typeof j.text === 'string' && j.text.trim()) return j.text;\n  if (typeof j.output_text === 'string' && j.output_text.trim()) return j.output_text;\n  if (Array.isArray(j.candidates) && j.candidates[0]?.content?.parts) {\n    const s = j.candidates[0].content.parts.map(p => p?.text).filter(Boolean).join('\\n').trim();\n    if (s) return s;\n  }\n  if (Array.isArray(j.choices) && j.choices[0]?.message?.content) return j.choices[0].message.content;\n  if (typeof j.content === 'string') return j.content;\n  if (typeof j === 'string') return j;\n  return null;\n}\nfunction tryParseJSON(s){\n  if (!s) return null;\n  try { return JSON.parse(s); } catch {}\n  const m = s.match(/```(?:json)?\\s*([\\s\\S]*?)```/i);\n  if (m) { try { return JSON.parse(m[1]); } catch {} }\n  const i = s.indexOf('{'), j = s.lastIndexOf('}');\n  if (i !== -1 && j !== -1 && j > i) { try { return JSON.parse(s.slice(i, j+1)); } catch {} }\n  return null;\n}\nconst raw = extractText($json);\nconst obj = tryParseJSON(raw);\nconst descripcion = String(obj?.descripcion ?? raw ?? '').trim();\nreturn { json: { descripcion, _parser: 'gemini-parse-v1' } };\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        6384,
+        1040
+      ],
+      "id": "a743af73-2c18-4859-a64c-4cd805a27e0d",
+      "name": "Parseo a Objeto (Gemini→JSON)"
+    },
+    {
+      "parameters": {
+        "batchSize": 2,
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        4608,
+        1040
+      ],
+      "id": "f182b159-7135-4d27-8719-ae700a9dd5e6",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Añade la config de throttle SIN tocar el binario\nconst item = $input.item; // conserva item.json y item.binary.data\nitem.json.throttleKey = 'ai:gemini';\nitem.json.rpm = 6;\nitem.json.capacity = 1;\nitem.json.jitterMs = 400;\nreturn item;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4960,
+        1056
+      ],
+      "id": "f0fa066c-83f2-4852-8209-35967349daa8",
+      "name": "AI Throttle Config"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// UniversalThrottle TB — IA — Run Once for Each Item\nconst key    = $json.throttleKey ?? 'ai:gemini';\nconst rpm    = Number($json.rpm ?? 6);        // llamadas por minuto\nconst capacity  = Number($json.capacity ?? 1); // ráfaga mínima\nconst jitterMax = Number($json.jitterMs ?? 400);\n\nconst store = (globalThis.__tbGlobal = globalThis.__tbGlobal || { __tb: {} });\nfunction sleep(ms){ return new Promise(r => setTimeout(r, ms)); }\n\nlet b = store.__tb[key];\nconst now = Date.now();\nconst rate = rpm / 60000;\n\nif (!b) b = { tokens: capacity, last: now };\nelse {\n  const elapsed = now - b.last;\n  b.tokens = Math.min(capacity, b.tokens + elapsed * rate);\n  b.last = now;\n}\n\nlet waitedMs = 0;\nif (b.tokens < 1) {\n  const need = 1 - b.tokens;\n  const wait = Math.ceil(need / rate) + Math.floor(Math.random() * jitterMax);\n  await sleep(wait);\n  waitedMs = wait;\n  const t = Date.now();\n  const el2 = t - b.last;\n  b.tokens = Math.min(capacity, b.tokens + el2 * rate);\n  b.last = t;\n}\n\nb.tokens = Math.max(0, b.tokens - 1);\nstore.__tb[key] = b;\n\n// Devolver SIEMPRE el item\nconst item = $input.item;\nitem.json.__aiThrottle = { key, rpm, capacity, waitedMs, tokensRemain: Number(b.tokens.toFixed(2)) };\nreturn item;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5408,
+        1056
+      ],
+      "id": "72451c2a-6108-41cf-80a9-9462955b8a52",
+      "name": "UniversalThrottle TB (AI)"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Asegura que el binario se llame 'data'\nconst item = $input.item;\nconst bin = item.binary || {};\nif (!bin.data) {\n  const keys = Object.keys(bin);\n  if (!keys.length) throw new Error('No binary found on item');\n  const first = keys[0];\n  bin.data = bin[first];            // clona\n  if (first !== 'data') delete bin[first]; // renombra\n}\nreturn item;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4800,
+        1056
+      ],
+      "id": "66b170d5-e6bf-46d3-9006-6534deb69bc2",
+      "name": "Ensure Binary 'data'"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Copia metadatos al item de la rama sin perder campos existentes\nconst it = $input.item;\n\nfunction safeNode(name) {\n  try { return $item(0).$node[name]?.json ?? {}; }\n  catch { return {}; }\n}\n\n// TODO: sustituye \"NODO_META\" por el nodo que tenga los metadatos base\nconst src = safeNode('Edit Fields');\n\nconst meta = {\n  FolderID: it.json.FolderID ?? src.FolderID ?? null,\n  DocBaseID: it.json.DocBaseID ?? src.DocBaseID ?? null,\n  ObraNombre: it.json.ObraNombre ?? src.ObraNombre ?? null,\n  ArquitectoNombre: it.json.ArquitectoNombre ?? src.ArquitectoNombre ?? null,\n  FechaVisitaISO: it.json.FechaVisitaISO ?? src.FechaVisitaISO ?? null,\n  ArquitectoEmail: it.json.ArquitectoEmail ?? src.ArquitectoEmail ?? 'automatizacionesgrau@gmail.com'\n};\n\nObject.assign(it.json, meta);\nreturn it;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5840,
+        1296
+      ],
+      "id": "f0c3cbac-f055-48b4-ac05-2140e78b9f36",
+      "name": "Propagar metadatos"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Copia metadatos al item de la rama sin perder campos existentes\nconst it = $input.item;\n\nfunction safeNode(name) {\n  try { return $item(0).$node[name]?.json ?? {}; }\n  catch { return {}; }\n}\n\n// TODO: sustituye \"NODO_META\" por el nodo que tenga los metadatos base\nconst src = safeNode('Edit Fields');\n\nconst meta = {\n  FolderID: it.json.FolderID ?? src.FolderID ?? null,\n  DocBaseID: it.json.DocBaseID ?? src.DocBaseID ?? null,\n  ObraNombre: it.json.ObraNombre ?? src.ObraNombre ?? null,\n  ArquitectoNombre: it.json.ArquitectoNombre ?? src.ArquitectoNombre ?? null,\n  FechaVisitaISO: it.json.FechaVisitaISO ?? src.FechaVisitaISO ?? null,\n  ArquitectoEmail: it.json.ArquitectoEmail ?? src.ArquitectoEmail ?? 'automatizacionesgrau@gmail.com'\n};\n\nObject.assign(it.json, meta);\nreturn it;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        6256,
+        704
+      ],
+      "id": "6b564042-8644-4735-bec9-28fb7e6f4fef",
+      "name": "Propagar metadatos1"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Copia metadatos al item de la rama sin perder campos existentes\nconst it = $input.item;\n\nfunction safeNode(name) {\n  try { return $item(0).$node[name]?.json ?? {}; }\n  catch { return {}; }\n}\n\n// TODO: sustituye \"NODO_META\" por el nodo que tenga los metadatos base\nconst src = safeNode('Edit Fields');\n\nconst meta = {\n  FolderID: it.json.FolderID ?? src.FolderID ?? null,\n  DocBaseID: it.json.DocBaseID ?? src.DocBaseID ?? null,\n  ObraNombre: it.json.ObraNombre ?? src.ObraNombre ?? null,\n  ArquitectoNombre: it.json.ArquitectoNombre ?? src.ArquitectoNombre ?? null,\n  FechaVisitaISO: it.json.FechaVisitaISO ?? src.FechaVisitaISO ?? null,\n  ArquitectoEmail: it.json.ArquitectoEmail ?? src.ArquitectoEmail ?? 'automatizacionesgrau@gmail.com'\n};\n\nObject.assign(it.json, meta);\nreturn it;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5296,
+        704
+      ],
+      "id": "6aca6353-d645-4850-bfae-2d7928791855",
+      "name": "Propagar metadatos2"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Normaliza entradas al formato que pide el agente\nconst it = $input.item;\nconst j = it.json || {};\n\nfunction asText(x) {\n  if (x == null) return '';\n  if (Array.isArray(x)) return x.filter(Boolean).join('\\n');\n  if (typeof x === 'object') return JSON.stringify(x, null, 2);\n  return String(x);\n}\n\n// 1) Fuentes originales\nconst chat = asText(j.texto_normalizado);                  // viene de tu 09_Normalizar\nconst trans = asText(j.transcripciones_audio || '');       // si existe\nconst descs = asText(j.descripciones_imagen || '');        // si existe\n\n// 2) Metadatos\nconst metaObj = {\n  FolderID: j.FolderID ?? null,\n  DocBaseID: j.DocBaseID ?? null,\n  ObraNombre: j.ObraNombre ?? null,\n  ArquitectoNombre: j.ArquitectoNombre ?? null,\n  FechaVisitaISO: j.FechaVisitaISO ?? null,\n  ArquitectoEmail: j.ArquitectoEmail ?? 'automatizacionesgrau@gmail.com'\n};\nconst metadatos = JSON.stringify(metaObj);\n\n// 3) Campos que el agente espera\nit.json.chat_texto = chat || 'no especificado';\nit.json.transcripciones_audio = trans || 'no especificado';\nit.json.descripciones_imagen = descs || 'no especificado';\nit.json.metadatos = metadatos;\n\nit.json.obra = j.ObraNombre || 'no especificado';\nit.json.arquitecto = j.ArquitectoNombre || 'no especificado';\nit.json.fecha_inicio = j.FechaVisitaISO || 'no especificado';\nit.json.fecha_fin = j.FechaVisitaFinISO || 'no especificado'; // ponlo si lo tienes; si no, queda \"no especificado\"\n\nreturn it;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        7136,
+        928
+      ],
+      "id": "fab7f9a5-81bf-4af1-b10d-8d9a7f369805",
+      "name": "Mapear Agente"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Mapea y recorta el acta para evitar finish_reason:length\nconst it = $input.item;\nconst j  = it.json || {};\n\nfunction asText(x){\n  if (x == null) return '';\n  if (Array.isArray(x)) return x.filter(Boolean).join('\\n');\n  if (typeof x === 'object') return JSON.stringify(x, null, 2);\n  return String(x);\n}\nfunction normalize(str){\n  return String(str || '')\n    .replace(/\\s+/g,' ')\n    .replace(/\\n{3,}/g,'\\n\\n')\n    .trim();\n}\nfunction truncate(str, max){\n  str = String(str || '');\n  if (str.length <= max) return str;\n  return str.slice(0, max-80) + '\\n[...truncado por longitud…]';\n}\n\n// Fuente base\nconst acta = asText(j.acta_texto ?? j.texto_normalizado ?? '');\n\n// Recorta duro para el extractor (ajusta si necesitas más)\nconst ACTA_MAX = 6000; // chars aprox. ~3–4k tokens brutos, seguro con instant\nconst acta_corta = truncate(normalize(acta), ACTA_MAX);\n\n// Contactos industriales a mapa nombre->email\nlet contactos = j.contactos_industriales ?? {};\nif (typeof contactos === 'string') { try { contactos = JSON.parse(contactos); } catch { contactos = {}; } }\nif (Array.isArray(contactos)) {\n  const map = {};\n  for (const c of contactos) if (c?.nombre) map[String(c.nombre).trim()] = c?.email ?? null;\n  contactos = map;\n}\n\nit.json.acta_texto = acta_corta || 'no especificado';\nit.json.obra       = j.ObraNombre || j.obra || 'no especificado';\nit.json.arquitecto = j.ArquitectoNombre || j.arquitecto || 'no especificado';\nit.json.fecha_fin  = j.FechaVisitaISO || j.fecha_fin || 'no especificado';\nit.json.contactos_industriales = contactos;\nit.json._emailMap  = contactos; // para el validador\n\nreturn it;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        7136,
+        1232
+      ],
+      "id": "f172005c-662d-4843-98b0-d332ed4bf4c6",
+      "name": "Mapear a Agente Tareas"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "5bba4267-7499-40be-8237-505dabbefa86",
+              "leftValue": "={{ $json.has_more }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        8208,
+        1232
+      ],
+      "id": "f148598b-2764-46b6-b409-ba79446ef0a1",
+      "name": "IF_More_Tasks"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "Eres un extractor experto de TAREAS. Devuelves SOLO JSON válido, sin texto extra.\nEsquema:\n{\n  \"tareas_page\": [{\"id\":\"string|null\",\"titulo\":\"string\",\"descripcion\":\"string\",\"industrial\":\"string\",\"prioridad\":\"alta|media|baja|null\",\"vence_el\":\"string|null\",\"origen\":{\"texto\":\"string|null\",\"imagenes\":[\"string\"],\"audios\":[\"string\"]},\"owner_nombre\":\"string|null\",\"owner_email\":\"string|null\",\"cc_emails\":[\"string\"]}],\n  \"emails_out\": [{\"to\":\"string\",\"cc\":[\"string\"],\"subject\":\"string\",\"body\":\"string\"}],\n  \"has_more\": boolean,\n  \"next_cursor\": \"string|null\",\n  \"resumen_para_arquitecto\": \"string\"\n}\nReglas: completa responsables con emailMap; pagina con has_more/next_cursor; español formal; nada fuera del JSON.\n",
+              "role": "system"
+            },
+            {
+              "content": "=Continuación.\ncursor_start: {{ $json.next_cursor || 0 }}\npage_size: {{ $json.page_size || 80 }}\n\nTexto:\n{{ $json.ctx_text }}\n\nAudios:\n{{ JSON.stringify($json.ctx_audio) }}\n\nImágenes:\n{{ JSON.stringify($json.ctx_imgs) }}\n\nemailMap:\n{{ JSON.stringify($json.emailMap || {}) }}\n\nDevuelve SOLO el JSON del esquema.\n"
+            }
+          ]
+        },
+        "simplify": false,
+        "jsonOutput": "={{ true }}",
+        "options": {
+          "frequency_penalty": 0,
+          "maxTokens": 4096,
+          "n": 1,
+          "temperature": 0.2,
+          "topP": 1,
+          "maxToolsIterations": 1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        8528,
+        1216
+      ],
+      "id": "e4c6d0c5-1417-47e2-9fb3-b41d0fb70a58",
+      "name": "11b_Extraer Tareas Continuación",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "maxTries": 2,
+      "credentials": {
+        "openAiApi": {
+          "id": "qNH5eWMA7l00MprD",
+          "name": "OPENAI_actas"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Agrega y normaliza salidas de 12_Validar... y 12b_Validar...\n// NO usa $items() dentro de Code. Devuelve UN array con UN item.\n\nconst items = $input.all() || [];\n\nlet tareas = [];\nlet emails = [];\nlet resums = [];\n\n// 1) Reunir páginas y metadatos útiles\nfor (const it of items) {\n  const j = it?.json || {};\n  if (Array.isArray(j.tareas_page)) tareas.push(...j.tareas_page);\n  if (Array.isArray(j.tareas)) tareas.push(...j.tareas);\n  if (Array.isArray(j.emails_out)) emails.push(...j.emails_out);\n  if (typeof j.resumen_para_arquitecto === 'string' && j.resumen_para_arquitecto.trim()) {\n    resums.push(j.resumen_para_arquitecto.trim());\n  }\n}\n\n// 2) Deduplicación por id|titulo\nconst seen = new Set();\ntareas = tareas.filter(t => {\n  if (!t || !t.titulo) return false;\n  const k = (t.id ? String(t.id) : '') + '|' + String(t.titulo).trim().toLowerCase();\n  if (seen.has(k)) return false;\n  seen.add(k);\n  return true;\n});\n\n// 3) Agrupar por industrial\nconst byInd = {};\nfor (const t of tareas) {\n  const ind = String(t.industrial || 'otros').toLowerCase();\n  (byInd[ind] ||= []).push(t);\n}\n\n// 4) Construir borradores por industrial si no vienen del agente\nconst emails_por_industrial = {};\nfor (const [ind, arr] of Object.entries(byInd)) {\n  let to = null;\n  for (const t of arr) {\n    to = t.owner_email || (t.responsable && t.responsable.email) || null;\n    if (to) break;\n  }\n  const bullets = arr.map((t, i) =>\n    `${i + 1}. ${t.titulo}${t.descripcion ? ` — ${t.descripcion}` : ''}${t.vence_el ? ` [límite ${t.vence_el}]` : ''}`\n  ).join('\\n');\n  emails_por_industrial[ind] = {\n    to: to || null,\n    subject: `Tareas pendientes – ${ind}`,\n    body: `Buenas,\\n\\nDetalle de tareas pendientes para ${ind}:\\n${bullets}\\n\\nGracias.`\n  };\n}\n\n// 5) Base de salida desde el primer item (sin $items())\nconst base = (items[0]?.json && typeof items[0].json === 'object') ? items[0].json : {};\n\nreturn [{\n  json: {\n    ...base,\n    tareas_all: tareas,\n    emails_out: emails,\n    emails_por_industrial,\n    resumen_para_arquitecto: resums[0] || (resums.length ? resums.join(' ') : null)\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        9104,
+        1552
+      ],
+      "id": "7495670a-9a60-43b0-b0f6-f36a54b65123",
+      "name": "13_Acumular Tareas"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const j = $json || {};\nconst list = Array.isArray(j.tareas_all) ? j.tareas_all : [];\nconst out = [];\nfor (const t of list) {\n  const titulo = (t.titulo || '').trim();\n  const desc = (t.descripcion || '').trim();\n  const resp = (t.owner_nombre || t.owner_email || '').trim();\n  const fecha = (t.vence_el || '').trim();\n  const ind = (t.industrial || '').trim();\n\n  const linea = [\n    titulo ? `• ${titulo}` : null,\n    ind ? `  - Industrial: ${ind}` : null,\n    desc ? `  - Descripción: ${desc}` : null,\n    resp ? `  - Responsable: ${resp}` : null,\n    fecha ? `  - Fecha límite: ${fecha}` : null,\n  ].filter(Boolean).join('\\n');\n\n  if (linea) out.push(linea);\n}\nconst texto = out.join('\\n\\n').trim() || '—';\nreturn { json: { ...j, texto_tareas: texto }, binary: $binary };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        9312,
+        1552
+      ],
+      "id": "2f6474f4-df72-4757-b68e-f31aa2ab2479",
+      "name": "14_Formatear bloque tareas (texto final)"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9f4378f8-7532-4cf0-a16c-9798d73180b2",
+              "name": "docTareasId",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        9728,
+        1552
+      ],
+      "id": "57066112-35ee-440c-856b-a15a585b6bee",
+      "name": "14_Set_docTareasId"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {
+          "clashHandling": {
+            "values": {
+              "resolveClash": "addSuffix"
+            }
+          },
+          "includeUnpaired": true
+        }
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        11120,
+        944
+      ],
+      "id": "51e524ae-0705-4a87-b991-b42e0c761e97",
+      "name": "Merge_PDF'2"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const j = $json || {};\nconst raw = j.agent_output ?? j.output ?? j.tareas ?? null;\nlet tareas = [], emails = [], hasMore = false, next = null, resumen = null;\n\ntry {\n  const obj = typeof raw === 'string' ? JSON.parse(raw) : (raw || {});\n  const arr = Array.isArray(obj.tareas_page)\n    ? obj.tareas_page\n    : (Array.isArray(obj.tareas) ? obj.tareas : (Array.isArray(obj) ? obj : []));\n  // Normaliza campos mínimos\n  for (const t of arr) {\n    const item = {\n      id: t.id ?? null,\n      titulo: String(t.titulo ?? t.texto ?? t.descripcion ?? '').trim(),\n      descripcion: String(t.descripcion ?? '').trim(),\n      industrial: String(t.industrial ?? '').trim(),\n      owner_nombre: t.owner_nombre ?? null,\n      owner_email: t.owner_email ?? null,\n      cc_emails: Array.isArray(t.cc_emails) ? t.cc_emails : [],\n      vence_el: t.vence_el ?? null,\n      origen: t.origen ?? null,\n      prioridad: t.prioridad ?? null,\n    };\n    if (item.titulo) tareas.push(item);\n  }\n  // Preserva emails estructurados\n  if (Array.isArray(obj.emails_out)) emails = obj.emails_out;\n  hasMore = Boolean(obj.has_more);\n  next = obj.next_cursor ?? null;\n  resumen = typeof obj.resumen_para_arquitecto === 'string' ? obj.resumen_para_arquitecto.trim() : null;\n} catch {}\n\nreturn { json: { ...j, tareas_page: tareas, emails_out: emails, has_more: hasMore, next_cursor: next, resumen_para_arquitecto: resumen }, binary: $binary };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        8896,
+        1216
+      ],
+      "id": "b8c0d7e4-ade6-400b-969e-0a1aab17740d",
+      "name": "12b_Validar salida agente (Tareas)"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const j = $json || {};\nconst raw = j.agent_output ?? j.output ?? j.tareas ?? null;\nlet tareas = [], emails = [], hasMore = false, next = null, resumen = null;\n\ntry {\n  const obj = typeof raw === 'string' ? JSON.parse(raw) : (raw || {});\n  const arr = Array.isArray(obj.tareas_page)\n    ? obj.tareas_page\n    : (Array.isArray(obj.tareas) ? obj.tareas : (Array.isArray(obj) ? obj : []));\n  // Normaliza campos mínimos\n  for (const t of arr) {\n    const item = {\n      id: t.id ?? null,\n      titulo: String(t.titulo ?? t.texto ?? t.descripcion ?? '').trim(),\n      descripcion: String(t.descripcion ?? '').trim(),\n      industrial: String(t.industrial ?? '').trim(),\n      owner_nombre: t.owner_nombre ?? null,\n      owner_email: t.owner_email ?? null,\n      cc_emails: Array.isArray(t.cc_emails) ? t.cc_emails : [],\n      vence_el: t.vence_el ?? null,\n      origen: t.origen ?? null,\n      prioridad: t.prioridad ?? null,\n    };\n    if (item.titulo) tareas.push(item);\n  }\n  // Preserva emails estructurados\n  if (Array.isArray(obj.emails_out)) emails = obj.emails_out;\n  hasMore = Boolean(obj.has_more);\n  next = obj.next_cursor ?? null;\n  resumen = typeof obj.resumen_para_arquitecto === 'string' ? obj.resumen_para_arquitecto.trim() : null;\n} catch {}\n\nreturn { json: { ...j, tareas_page: tareas, emails_out: emails, has_more: hasMore, next_cursor: next, resumen_para_arquitecto: resumen }, binary: $binary };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        7920,
+        1232
+      ],
+      "id": "9567205f-e01a-494d-b343-309989634df1",
+      "name": "12_Validar salida agente (Tareas)"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e04c7e5e-89f0-4670-a27a-890b5e505ba5",
+              "name": "ctx_text",
+              "value": "={{ $json.chat_texto || $json.texto_normalizado || $json.acta_texto || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "429f45e9-8412-41c1-b4b3-6f75080d64f8",
+              "name": "ctx_audio",
+              "value": "={{ $json.transcripciones_audio || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "2a671d7f-636b-45f4-a2f0-f1bc24e073e0",
+              "name": "ctx_imgs",
+              "value": "={{ $json.descripciones_imagen || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "997b2c5b-bdbe-42b4-a154-908ff113336c",
+              "name": "emailMap",
+              "value": "={{ $json._emailMap || $json.contactos_industriales || {} }}",
+              "type": "string"
+            },
+            {
+              "id": "c458c035-5641-4c5f-88dd-be86adea88b9",
+              "name": "cursor_start",
+              "value": "={{ $json.cursor_start || 0 }}",
+              "type": "string"
+            },
+            {
+              "id": "a2db7b9b-29fa-4be5-a748-34b66c03b578",
+              "name": "page_size",
+              "value": "={{ $json.page_size || 80 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        7360,
+        1232
+      ],
+      "id": "b85211be-5c4a-4842-832f-905b249762bc",
+      "name": "11_Prepare_Context"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Construye lista de imágenes y marcadores, sin romper el flujo por-item.\n// Añade __imagenes_all y __imgs_md_all a CADA item y preserva $binary.\n\nconst items = $input.all();\n\nfunction findImageBinary(b) {\n  if (!b) return null;\n  for (const k of Object.keys(b)) {\n    const v = b[k];\n    if (v && typeof v.mimeType === 'string' && v.mimeType.startsWith('image/')) {\n      return { key: k, bin: v };\n    }\n  }\n  return null;\n}\n\nconst imagenes = [];\nfor (const it of items) {\n  const j = it.json ?? {};\n  const fb = findImageBinary(it.binary);\n  const bin = fb?.bin || {};\n  const meta = {\n    fileId: j.fileId ?? j.id ?? bin.fileId ?? null,\n    name: bin.fileName ?? j.name ?? null,\n    mimeType: bin.mimeType ?? j.mimeType ?? null,\n    caption: '' // la descripción se consolidará tras el parse\n  };\n  if (meta.fileId || meta.name || meta.mimeType) imagenes.push(meta);\n}\n\nconst imgs_md = imagenes\n  .map(x => `[[IMG:${x.fileId || x.name || 'unknown'}|${x.caption||''}]]`)\n  .join('\\n');\n\nreturn items.map((it) => ({\n  json: { ...(it.json || {}), __imagenes_all: imagenes, __imgs_md_all: imgs_md },\n  binary: it.binary\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        6192,
+        1040
+      ],
+      "id": "4a252201-22c4-4c7f-bce3-8bab0b3193b6",
+      "name": "58b_Agrupar Imágenes + Marcadores"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Construye lista de audios con transcripción y un bloque audios_md.\n// Añade __audios_all y __audios_md_all a cada item. Preserva $binary.\n\nconst items = $input.all();\n\nfunction findAudioBinary(b) {\n  if (!b) return null;\n  for (const k of Object.keys(b)) {\n    const v = b[k];\n    if (v && typeof v.mimeType === 'string' && v.mimeType.startsWith('audio/')) {\n      return { key: k, bin: v };\n    }\n  }\n  return null;\n}\n\nconst audios = [];\nlet idx = 0;\nfor (const it of items) {\n  const j = it.json ?? {};\n  const fb = findAudioBinary(it.binary);\n  const bin = fb?.bin || {};\n  const nombre = j.name ?? bin.fileName ?? `audio_${++idx}`;\n  const texto = String(j.text ?? j.transcript ?? j.transcription ?? j.audio_text ?? '').trim();\n  const dur = Number.isFinite(j.duration) ? j.duration : (Number.isFinite(bin.duration) ? bin.duration : null);\n\n  if (nombre || texto) {\n    audios.push({ name: nombre, duracion_seg: dur ?? null, texto });\n  }\n}\n\nconst audios_md = audios\n  .map(a => `- ${a.name}: ${a.texto ? a.texto.slice(0, 200) : '—'}`)\n  .join('\\n');\n\nreturn items.map((it) => ({\n  json: { ...(it.json || {}), __audios_all: audios, __audios_md_all: audios_md },\n  binary: it.binary\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5024,
+        704
+      ],
+      "id": "60b7cbf7-999b-486b-a922-67fc05aec998",
+      "name": "04b_Agrupar Audios + Marcadores"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "Eres un agente extractor de TAREAS de visitas de obra. Devuelves SOLO JSON válido, sin texto extra, sin Markdown.\n\nEsquema de salida (un único objeto):\n{\n  \"tareas_page\": [\n    {\n      \"id\": \"string|null\",\n      \"industrial\": \"string\",                 // p.ej. electricidad, carpintería, instalaciones, acabados, mobiliario\n      \"titulo\": \"string\",\n      \"descripcion\": \"string\",\n      \"prioridad\": \"alta\"|\"media\"|\"baja\"|null,\n      \"vence_el\": \"string|null\",              // ISO yyyy-mm-dd\n      \"origen\": {\"texto\":\"string|null\",\"imagenes\":[\"string\"],\"audios\":[\"string\"]},\n      \"owner_nombre\": \"string|null\",\n      \"owner_email\": \"string|null\",\n      \"cc_emails\": [\"string\"]\n    }\n  ],\n  \"emails_out\": [\n    { \"to\":\"string\",\"cc\":[\"string\"],\"subject\":\"string\",\"body\":\"string\" }\n  ],\n  \"has_more\": boolean,\n  \"next_cursor\": \"string|null\",\n  \"resumen_para_arquitecto\": \"string\"\n}\n\nReglas de extracción:\n- Extrae TODO lo implícito si es deducible con alta probabilidad; si no, omite.\n- “industrial” (normaliza a minúsculas): usa una de [electricidad, carpintería, instalaciones, acabados, mobiliario, obra_civil] si aplica; si no claro, elige la más cercana.\n- “prioridad”: usa “alta” solo si hay urgencia/impacto; si no se deduce, “media” por defecto es aceptable; nunca inventes fechas límite.\n- “vence_el”: únicamente si se menciona fecha clara o se deduce inequívocamente; si no, null.\n- “origen”:\n  - “texto”: frase breve citada (opcional) o null.\n  - “imagenes”: ids/nombres de imágenes relevantes si mencionadas; si no, [].\n  - “audios”: lista de ids de audio referidos (p. ej., [\"audio_3\"]); si no, [].\n- “owner_nombre / owner_email”:\n  - Resuelve emails usando emailMap (coincidencia exacta o por nombre parcial).\n  - Si no hay coincidencia y se proporcionó fallback_owner_email, pon to=fallback_owner_email y cc incluye ArquitectoEmail si existe; en el “titulo”/“descripcion” mantén el owner_nombre si se conoce.\n  - Si no hay fallback y no se resuelve email, deja owner_email=null y NO generes un email para ese responsable.\n\nReglas de emails_out:\n- Un borrador por responsable con email resuelto (o por fallback), agrupando sus tareas.\n- Español formal, con bullets de tareas, contexto breve y llamada a la acción con plazo si corresponde.\n- subject: “[OBRA] – Acciones pendientes para <owner_nombre>”\n- to: owner_email (o fallback_owner_email)\n- cc: incluir ArquitectoEmail si existe y otros de cc_emails si corresponde.\n\nPaginación:\n- Devuelve hasta page_size tareas comenzando en cursor_start.\n- Si hay más tareas pendientes, has_more=true y next_cursor al siguiente índice.\n\nLimpieza:\n- Ignora entradas vacías y “—” y “no especificado”.\n- No inventes datos.\n\nSalida:\n- Exactamente UN objeto JSON que cumpla el esquema."
+            },
+            {
+              "content": "=Contexto unificado:\n\nTexto:\n{{ $json.ctx_text || \"\" }}\n\nAudios (array de objetos):\n{{ JSON.stringify($json.ctx_audio || []) }}\n// Formato: [{ \"name\":\"audio_1\", \"texto\":\"...\" }, ...]\n\nImágenes (array):\n{{ JSON.stringify($json.ctx_imgs || []) }}\n// Formato: [{ \"fileId\":\"...\", \"name\":\"...\", \"caption\":\"...\" }]\n\nemailMap (objeto):\n{{ JSON.stringify($json.emailMap || {}) }}\n// Ejemplo: { \"Sebas\":\"sebas@proveedor.com\", \"Albert Bosch\":\"albert@carpinteria.com\" }\n\nArquitectoEmail:\n{{ $json.ArquitectoEmail || null }}\n\nfallback_owner_email (opcional):\n{{ $json.fallback_owner_email || null }}\n\nPaginación:\n- page_size: {{ Number($json.page_size || 80) }}\n- cursor_start: {{ Number($json.cursor_start || 0) }}\n\nInstrucciones:\n1) Devuelve hasta page_size tareas desde cursor_start.\n2) Completa responsables y emails usando emailMap; si no se resuelve y hay fallback_owner_email, úsalo.\n3) Rellena emails_out con un borrador por responsable con email resuelto (o fallback).\n4) Si quedan tareas, marca has_more=true y define next_cursor.\n5) SOLO el JSON del esquema."
+            }
+          ]
+        },
+        "simplify": false,
+        "builtInTools": {},
+        "options": {
+          "maxTokens": 4000,
+          "temperature": 0.1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2,
+      "position": [
+        7568,
+        1232
+      ],
+      "id": "ef101508-1db9-4b25-8fc0-55c941ff83da",
+      "name": "11_Extraer Tareas",
+      "credentials": {
+        "openAiApi": {
+          "id": "qNH5eWMA7l00MprD",
+          "name": "OPENAI_actas"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Modo: Each item\nconst b = $binary || {};\nconst tareas = b.tareas_pdf;\n\nif (!tareas?.data) {\n  return { json: { ...$json, __pdf_error_2: 'To-Do: no viene tareas_pdf' }, binary: b };\n}\n\nconst fixed = {\n  ...tareas,\n  mimeType: tareas.mimeType || 'application/pdf',\n  fileExtension: tareas.fileExtension || 'pdf',\n  fileName: tareas.fileName || `To-Do - ${$json.ObraNombre || 'Obra'}.pdf`,\n};\n\nreturn { json: { ...$json }, binary: { ...b, tareas_pdf: fixed } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        10560,
+        1552
+      ],
+      "id": "a0619fc1-3a5f-4f27-8598-7b264032a980",
+      "name": "6b_Renombrar binario Tareas"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Modo: Each item\nconst b=$binary||{};\nconst size=k=>b[k]?.data?Buffer.from(b[k].data,'base64').length:0;\nreturn {\n  json:{\n    ...$json,\n    __audit:{\n      to:$json.__gmail_to,\n      subject:$json.__gmail_subject,\n      body_len:String($json.__gmail_body||'').length,\n      bin_keys:Object.keys(b||{}),\n      acta_bytes:size('acta_pdf'),\n      tareas_bytes:size('tareas_pdf')\n    }\n  },\n  binary:b\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        11584,
+        944
+      ],
+      "id": "e2aca67b-f920-4472-af67-331aff2a7161",
+      "name": "Auditar"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Modo: Each item\nconst j = $json || {}, b = $binary || {};\nconst to = (j.__gmail_to || j.ArquitectoEmail || 'automatizacionesgrau@gmail.com').trim();\nconst subject = (j.__gmail_subject || `Acta y Tareas — ${j.ObraNombre || 'Obra'}`).trim();\nconst body = (j.__gmail_body || 'Adjunto Acta y To-Do PDF.').trim();\n\nconst adjuntos_ok = Boolean(b.acta_pdf?.data && b.tareas_pdf?.data);\n\nreturn {\n  json: { ...j, __gmail_to: to, __gmail_subject: subject, __gmail_body: body, adjuntos_ok },\n  binary: { acta_pdf: b.acta_pdf, tareas_pdf: b.tareas_pdf },\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        11360,
+        944
+      ],
+      "id": "76cb9563-2cec-4e62-83d1-f2719536f6b6",
+      "name": "16c_Normalizar para Gmail"
+    },
+    {
+      "parameters": {
+        "url": "=https://www.googleapis.com/drive/v3/files/{{ $json.docActaId || $json.documentId_1 || $json.documentId }}/export\n",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "mimeType",
+              "value": "application/pdf"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "acta_pdf"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        9360,
+        928
+      ],
+      "id": "2ec1eb03-7500-4ca6-8252-ecacdedf393b",
+      "name": "16a_HTTP_export_acta",
+      "retryOnFail": true,
+      "credentials": {
+        "oAuth2Api": {
+          "id": "PB91Lzf5qO5wukpj",
+          "name": "OAUTH Docs!!!"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "=https://www.googleapis.com/drive/v3/files/{{ $json.docTareasId || $json.documentId_2 || $json.documentId || $node[\"14CrearToDoDoc\"].json.id || $node[\"14_Crear ToDo Doc\"].json.id || $node[\"14CrearToDoDoc\"].json.id }}/export\n",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "mimeType",
+              "value": "application/pdf"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/pdf"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "tareas_pdf"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        10160,
+        1552
+      ],
+      "id": "008c027e-b381-41d2-9ef2-b6564c05d13f",
+      "name": "16b_HTTP_export_tareas",
+      "retryOnFail": true,
+      "credentials": {
+        "oAuth2Api": {
+          "id": "PB91Lzf5qO5wukpj",
+          "name": "OAUTH Docs!!!"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Code node: Run Once for All Items\nfunction insertText(text){ return { insertText: { location: { index: 1 }, text } }; }\nfunction makeHeading(rangeLen, level){\n  return {\n    updateParagraphStyle: {\n      range: { startIndex: 1, endIndex: 1 + rangeLen },\n      paragraphStyle: { namedStyleType: level === 1 ? 'HEADING_1' : 'HEADING_2' },\n      fields: 'namedStyleType'\n    }\n  };\n}\nfunction parseMarker(m){\n  const m2 = String(m||'').match(/^\\s*\\[\\[IMG:([^|\\]]+)\\|?([^\\]]*)\\]\\]\\s*$/i);\n  if (!m2) return null;\n  return { fileId: m2[1].trim(), caption: (m2[2]||'').trim() };\n}\nfunction tryParseJSON(v){\n  if (typeof v === 'string') { try { return JSON.parse(v); } catch { return null; } }\n  return (v && typeof v === 'object') ? v : null;\n}\n\n// 1) Leer la entrada (IMPORTANTE)\nconst input = await $input.all();\n\n// 2) Detectar si viene un único item del agente con {bloques}\nlet bloques = [];\nconst j0 = input[0]?.json ?? {};\nlet content = j0;\n\n// Si viene estructura estilo OpenAI con simplify:false\nif (Array.isArray(j0?.choices)) content = j0.choices?.[0]?.message?.content;\n// Si viene en \"content\"\nif (j0?.content && !Array.isArray(j0?.choices)) content = j0.content;\n\nconst acta = tryParseJSON(content) || (content && content.bloques ? content : null);\nif (Array.isArray(acta?.bloques)) {\n  bloques = acta.bloques.map(b => ({\n    tipo: String(b?.tipo || 'p').toLowerCase(),\n    text: String(b?.text || '').trim(),\n    marker: b?.marker,\n    fileId: b?.fileId || b?.name || '',\n    caption: String(b?.caption || '').trim(),\n  }));\n} else {\n  // Fallback: tratar cada item como un bloque\n  for (const it of input) {\n    const b = it.json || {};\n    if (b.tipo || b.text || b.marker || b.fileId || b.name) {\n      bloques.push({\n        tipo: String(b.tipo || 'p').toLowerCase(),\n        text: String(b.text || '').trim(),\n        marker: b.marker,\n        fileId: b.fileId || b.name || '',\n        caption: String(b.caption || '').trim(),\n      });\n    }\n  }\n}\n\n// 3) Construir requests\nconst requests = [];\nfor (const b of bloques) {\n  if ((b.tipo === 'h1' || b.tipo === 'h2') && b.text) {\n    const t = `${b.text}\\n`;\n    requests.push(insertText(t), makeHeading(t.length, b.tipo === 'h1' ? 1 : 2));\n    continue;\n  }\n  if (b.tipo === 'img') {\n    let fileId = b.fileId, caption = b.caption;\n    if (!fileId && b.marker) {\n      const p = parseMarker(b.marker);\n      if (p) { fileId = p.fileId; caption = caption || p.caption; }\n    }\n    if (caption) requests.push(insertText(`${caption}\\n`));\n    if (fileId) {\n      requests.push({\n        insertInlineImage: {\n          location: { index: 1 },\n          uri: `DRIVE_PUBLIC_URL://${fileId}`,\n          objectSize: { height: { magnitude: 300, unit: 'PT' } }\n        }\n      });\n      requests.push(insertText('\\n'));\n    }\n    continue;\n  }\n  const t = b.text?.trim();\n  if (t) requests.push(insertText(t + '\\n'));\n}\n\n// 4) Fallback\nif (!requests.length) requests.push(insertText('Acta de visita\\n'));\n\n// 5) Salida única\nreturn [{ json: { requests } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        7696,
+        944
+      ],
+      "id": "e14d2940-4027-4fb3-b84e-f9ba88451484",
+      "name": "13b_Generar_Requests_Docs"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://www.googleapis.com/drive/v3/files/{{$json.id}}/permissions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "supportsAllDrives",
+              "value": "true"
+            },
+            {
+              "name": "sendNotificationEmail",
+              "value": "false"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"type\":\"anyone\",\"role\":\"reader\",\"allowFileDiscovery\":false}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        7280,
+        736
+      ],
+      "id": "294ff60f-b98f-4471-a044-dddd60279be9",
+      "name": "13b.1_Hacer públicas las imágenes",
+      "credentials": {
+        "oAuth2Api": {
+          "id": "PB91Lzf5qO5wukpj",
+          "name": "OAUTH Docs!!!"
+        },
+        "httpHeaderAuth": {
+          "id": "xMVN7irBv4njTFyk",
+          "name": "Header Auth"
+        },
+        "googleOAuth2Api": {
+          "id": "TOiS11odf0J0VjtU",
+          "name": "OAuth2 Google"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nlet requests = null;\nfor (const it of items) { if (Array.isArray(it.json?.requests)) { requests = it.json.requests; break; } }\nif (!Array.isArray(requests)) requests = [];\nconst images = [];\nfor (const it of items) {\n  const j = it.json || {};\n  if (j.id && /^image\\//.test(String(j.mimeType || ''))) {\n    images.push({ fileId: j.id, url: `https://drive.google.com/uc?export=download&id=${j.id}` });\n  }\n}\nconst map = new Map(images.map(x => [String(x.fileId), String(x.url)]));\nfor (const r of requests) {\n  const ins = r?.insertInlineImage;\n  if (ins?.uri && String(ins.uri).startsWith('DRIVE_PUBLIC_URL://')) {\n    const fileId = String(ins.uri).replace('DRIVE_PUBLIC_URL://', '');\n    const url = map.get(fileId);\n    if (url) ins.uri = url;\n  }\n}\nreturn [{ json: { requests } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        8016,
+        944
+      ],
+      "id": "6597577f-389d-4762-ad93-ee0f0ebf319a",
+      "name": "13c_Resolver_URLs_Imagen"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://docs.googleapis.com/v1/documents/{{$json.id}}:batchUpdate",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "requests",
+              "value": "={{ $json.requests }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        9040,
+        928
+      ],
+      "id": "95ec0f7f-206c-4481-b59d-debda73cb9e2",
+      "name": "13d_Docs batchUpdate (Insertar texto+imágenes)",
+      "credentials": {
+        "oAuth2Api": {
+          "id": "PB91Lzf5qO5wukpj",
+          "name": "OAUTH Docs!!!"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {
+          "includeUnpaired": false
+        }
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        8528,
+        928
+      ],
+      "id": "369269a8-e301-40bf-b8bd-fcd3ce334532",
+      "name": "13c.1_Unir DocId+Requests"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Run Once for All Items\n// Entrada: varios items { json: { requests: [...] } } con URIs ya resueltas.\n// Salida: un único item { json: { requests: [...] } } con todas las operaciones.\nconst all = [];\nfor (const it of items) {\n  const reqs = Array.isArray(it.json?.requests) ? it.json.requests : [];\n  for (const r of reqs) all.push(r);\n}\nreturn [{ json: { requests: all } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        8272,
+        944
+      ],
+      "id": "adbb5ef4-f504-488e-b5a6-8782528f9877",
+      "name": "13c.0_Compactar todas las requests"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const id = $json.id || $json.docId || $json.documentId;\nconst reqs = Array.isArray($json.requests) ? $json.requests : [];\nif (!id) throw new Error('Falta id del documento');\nif (!reqs.length) {\n  reqs.push({ insertText: { location: { index: 1 }, text: 'Acta de visita\\n' } });\n}\nreturn { json: { id, requests: reqs } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        8736,
+        928
+      ],
+      "id": "1ee8b733-f2fb-445c-9dd0-4a10af4dba32",
+      "name": "GUARD"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Imagen -> Descripción (fallback 503) — Run Once for Each Item\nconst it = $input.item;\nconst j = it.json || {};\nconst b = it.binary || {};\n\n// Intenta localizar el binario de imagen\nlet imgBin = b.data;\nif (!imgBin) {\n  const keys = Object.keys(b || {});\n  if (keys.length) imgBin = b[keys[0]];\n}\n\n// Identificadores y metadatos\nconst name = j.name || imgBin?.fileName || `imagen_${Date.now()}.jpg`;\nconst mime = imgBin?.mimeType || j.mimeType || '';\nconst fileId = j.id || j.fileId || imgBin?.fileId || null;\n\n// Mensaje de error si viene de la rama error del nodo IA\nconst errorMsg =\n  (j.error && (j.error.message || j.error.description)) ||\n  j.message ||\n  j.statusText ||\n  'Servicio no disponible (503)';\n\n// Descripción de fallback (concisa y técnica)\nconst baseDesc = j.descripcion && String(j.descripcion).trim()\n  ? String(j.descripcion).trim()\n  : `Descripción técnica no disponible por sobrecarga temporal del modelo (fallback). Archivo: ${name}${mime ? ` (${mime})` : ''}.`;\n\n// Marker [[IMG:...|...]] para integrarlo en el agregador\nconst markerId = fileId || name;\nconst caption = baseDesc.length > 140 ? baseDesc.slice(0, 140) + '…' : baseDesc;\nconst marker = `[[IMG:${markerId}|${caption}]]`;\n\n// Enriquecemos el json y preservamos binarios\nit.json = {\n  ...j,\n  descripcion: baseDesc,\n  __img_marker: marker,\n  imagen: {\n    fileId: fileId,\n    name: name,\n    mimeType: mime,\n    caption: caption,\n  },\n  vision_model: 'fallback:metadata',\n  vision_status: 'ok',\n  vision_attempts: Number(j.vision_attempts || 0),\n  vision_error: errorMsg || null,\n};\n\nit.binary = b;\nreturn it;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5920,
+        1072
+      ],
+      "id": "6c6a2511-5433-4687-95ea-a6d9a4960dd5",
+      "name": "Imagen -> Descripción (fallback 503)"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// AI Throttle Config — Run Once for Each Item\nconst item = $input.item;\nitem.json.throttleKey = 'ai:gemini';\nitem.json.rpm = 6;\nitem.json.capacity = 1;\nitem.json.jitterMs = 400;\nreturn item;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5168,
+        1056
+      ],
+      "id": "b8d4e098-1343-40ac-9f06-cac04f92e87b",
+      "name": "Parametros para Throttle"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e1d977ac-b055-4d32-b95d-ef1ccc255491",
+              "name": "docActaId",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        8272,
+        736
+      ],
+      "id": "cbf9222c-4d42-435b-9fef-b8172f30e91c",
+      "name": "12b_Set_docActaId"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Modo: Each item\nconst b = $binary || {};\nconst acta = b.acta_pdf;\n\nif (!acta?.data) {\n  return { json: { ...$json, __pdf_error_1: 'Acta: no viene acta_pdf' }, binary: b };\n}\n\nconst fixed = {\n  ...acta,\n  mimeType: acta.mimeType || 'application/pdf',\n  fileExtension: acta.fileExtension || 'pdf',\n  fileName: acta.fileName || `Acta - ${$json.ObraNombre || 'Obra'}.pdf`,\n};\n\nreturn { json: { ...$json }, binary: { ...b, acta_pdf: fixed } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        9744,
+        928
+      ],
+      "id": "e4a7585e-2097-4c2f-aa47-57b183530454",
+      "name": "6a_Renombrar binario Acta1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "04168a1e-e80e-422d-967d-da076bae1395",
+              "leftValue": "={{ $json.adjuntos_ok }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        11792,
+        944
+      ],
+      "id": "1394d808-124f-489e-b14e-91b997c52333",
+      "name": "16d_IF_PDFs_OK"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Edit Fields1').item.json.message.chat.id }}",
+        "text": "No se han podido generar los PDFs (Acta o To‑Do). Revisa credenciales y IDs",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        12112,
+        1184
+      ],
+      "id": "1f02a7cd-1e1e-454a-ae0b-cd6d635996c7",
+      "name": "Send a text message",
+      "webhookId": "05942494-1e1a-4228-9eea-3953e2fc59f4",
+      "credentials": {
+        "telegramApi": {
+          "id": "zsEfatxtBaKa0n2X",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a28c7943-def3-4471-a71b-44afadc0f0d9",
+              "name": "chatId",
+              "value": "={{ $('01_Recibir Mensaje').item.json.message.chat.id }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        11792,
+        656
+      ],
+      "id": "39334dac-6572-4736-935a-cdd3372d2d74",
+      "name": "Edit Fields2"
+    }
+  ],
+  "pinData": {
+    "01_Recibir Mensaje": [
+      {
+        "json": {
+          "update_id": 333721854,
+          "message": {
+            "message_id": 1373,
+            "from": {
+              "id": 5779028581,
+              "is_bot": false,
+              "first_name": "Pedro",
+              "last_name": "Pascal",
+              "username": "testeraut",
+              "language_code": "es"
+            },
+            "chat": {
+              "id": -1002949494661,
+              "title": "Obra - Fincas Hosta",
+              "type": "supergroup"
+            },
+            "date": 1762961085,
+            "text": "/fin_visita",
+            "entities": [
+              {
+                "offset": 0,
+                "length": 11,
+                "type": "bot_command"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "connections": {
+    "01_Recibir Mensaje": {
+      "main": [
+        [
+          {
+            "node": "Añadir audio - Binary",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Throttle Config1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "03_Buscar Visita": {
+      "main": [
+        [
+          {
+            "node": "Cojer ultima fila",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Cojer ultima fila",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "09c_Cerrar Sheet": {
+      "main": [
+        [
+          {
+            "node": "13b_Visita Cerrada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "11a_Crear Carpeta": {
+      "main": [
+        [
+          {
+            "node": "Throttle Config5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "11b_Crear Documento": {
+      "main": [
+        [
+          {
+            "node": "11c_Crear Fila",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "11c_Crear Fila": {
+      "main": [
+        [
+          {
+            "node": "13a_Visita Creada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "02_Añadir Datos": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Activa o Cerrada": {
+      "main": [
+        [
+          {
+            "node": "Fin visita?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Iniciar Visita",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Visita cerrada & Comando cerrar",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Throttle Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Iniciar Visita": {
+      "main": [
+        [
+          {
+            "node": "11a_Crear Carpeta",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Cerrar Visita?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Unir datos",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Throttle Config2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Throttle Config2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cerrar Visita?": {
+      "main": [
+        [
+          {
+            "node": "Throttle Config3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "13c_Solicitar Iniciar Visita",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Visita cerrada & Comando cerrar": {
+      "main": [
+        [
+          {
+            "node": "13c_Solicitar Iniciar Visita",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Activa o Cerrada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cojer ultima fila": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ID Documento": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Unir datos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ID Documento1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Unir datos": {
+      "main": [
+        [
+          {
+            "node": "09a_Guardar Texto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Añadir audio - Binary": {
+      "main": [
+        [
+          {
+            "node": "02_Añadir Datos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fin visita?": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Cerrar Visita?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "09b_Guardar Archivo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "13b_Visita Cerrada": {
+      "main": [
+        [
+          {
+            "node": "Indice Datos Visita",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FechaVisitaISO": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "03_Decidir Tipo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "03_Decidir Tipo": {
+      "main": [
+        [
+          {
+            "node": "Unir Datos Audio",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        [
+          {
+            "node": "Unir Datos Imagen",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unir Datos Texto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "04_Transcribir Audio": {
+      "main": [
+        [
+          {
+            "node": "04b_Agrupar Audios + Marcadores",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "08_Unir Entradas": {
+      "main": [
+        [
+          {
+            "node": "09_Normalizar Texto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "09_Normalizar Texto": {
+      "main": [
+        [
+          {
+            "node": "Mapear a Agente Tareas",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Mapear Agente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "10_Generar Acta": {
+      "main": [
+        [
+          {
+            "node": "13b_Generar_Requests_Docs",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "12_Crear Acta Doc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "12_Crear Acta Doc": {
+      "main": [
+        [
+          {
+            "node": "12b_Set_docActaId",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "14_Crear ToDo Doc": {
+      "main": [
+        [
+          {
+            "node": "14_Set_docTareasId",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "15_Actualizar ToDo": {
+      "main": [
+        [
+          {
+            "node": "16b_HTTP_export_tareas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Indice Datos Visita": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Descargar Audio": {
+      "main": [
+        [
+          {
+            "node": "04_Transcribir Audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Unir Datos Audio",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Unir Datos Texto",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Unir Datos Imagen",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Buscar Audio": {
+      "main": [
+        [
+          {
+            "node": "Descargar Audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar Imagenes": {
+      "main": [
+        [
+          {
+            "node": "Descargar Imagenes",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "13b.1_Hacer públicas las imágenes",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "13b_Generar_Requests_Docs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unir Datos Imagen": {
+      "main": [
+        [
+          {
+            "node": "Buscar Imagenes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Descargar Imagenes": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar Documento Texto": {
+      "main": [
+        [
+          {
+            "node": "Descargar Texto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unir Datos Texto": {
+      "main": [
+        [
+          {
+            "node": "Buscar Documento Texto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Descargar Texto": {
+      "main": [
+        [
+          {
+            "node": "Extraer Texto del Doc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extraer Texto del Doc": {
+      "main": [
+        [
+          {
+            "node": "Propagar metadatos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "13c_Solicitar Iniciar Visita": {
+      "main": [
+        [
+          {
+            "node": "Final de trayecto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "13a_Visita Creada": {
+      "main": [
+        [
+          {
+            "node": "Final de trayecto1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "09b_Guardar Archivo": {
+      "main": [
+        [
+          {
+            "node": "Final de trayecto2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "09a_Guardar Texto": {
+      "main": [
+        [
+          {
+            "node": "Final de trayecto3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unir Datos Audio": {
+      "main": [
+        [
+          {
+            "node": "Buscar Audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze an image": {
+      "main": [
+        [
+          {
+            "node": "58b_Agrupar Imágenes + Marcadores",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Imagen -> Descripción (fallback 503)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "FechaVisitaISO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Throttle Config": {
+      "main": [
+        [
+          {
+            "node": "UniversalThrottle TB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Throttle Config1": {
+      "main": [
+        [
+          {
+            "node": "UniversalThrottle TB1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Throttle Config2": {
+      "main": [
+        [
+          {
+            "node": "UniversalThrottle TB2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Throttle Config3": {
+      "main": [
+        [
+          {
+            "node": "UniversalThrottle TB3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "UniversalThrottle TB": {
+      "main": [
+        [
+          {
+            "node": "ID Documento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "UniversalThrottle TB1": {
+      "main": [
+        [
+          {
+            "node": "03_Buscar Visita",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "UniversalThrottle TB2": {
+      "main": [
+        [
+          {
+            "node": "ID Documento1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "UniversalThrottle TB3": {
+      "main": [
+        [
+          {
+            "node": "09c_Cerrar Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Throttle Config4": {
+      "main": [
+        [
+          {
+            "node": "UniversalThrottle TB4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Throttle Config5": {
+      "main": [
+        [
+          {
+            "node": "UniversalThrottle TB5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "UniversalThrottle TB5": {
+      "main": [
+        [
+          {
+            "node": "11b_Crear Documento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parseo a Objeto (Gemini→JSON)": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Propagar metadatos1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ensure Binary 'data'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Throttle Config": {
+      "main": [
+        [
+          {
+            "node": "Parametros para Throttle",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "UniversalThrottle TB (AI)": {
+      "main": [
+        [
+          {
+            "node": "Analyze an image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ensure Binary 'data'": {
+      "main": [
+        [
+          {
+            "node": "AI Throttle Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Propagar metadatos1": {
+      "main": [
+        [
+          {
+            "node": "08_Unir Entradas",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Propagar metadatos2": {
+      "main": [
+        [
+          {
+            "node": "08_Unir Entradas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Propagar metadatos": {
+      "main": [
+        [
+          {
+            "node": "08_Unir Entradas",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Mapear Agente": {
+      "main": [
+        [
+          {
+            "node": "10_Generar Acta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mapear a Agente Tareas": {
+      "main": [
+        [
+          {
+            "node": "11_Prepare_Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF_More_Tasks": {
+      "main": [
+        [
+          {
+            "node": "11b_Extraer Tareas Continuación",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "13_Acumular Tareas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "11b_Extraer Tareas Continuación": {
+      "main": [
+        [
+          {
+            "node": "12b_Validar salida agente (Tareas)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "13_Acumular Tareas": {
+      "main": [
+        [
+          {
+            "node": "14_Formatear bloque tareas (texto final)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "14_Formatear bloque tareas (texto final)": {
+      "main": [
+        [
+          {
+            "node": "14_Crear ToDo Doc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "14_Set_docTareasId": {
+      "main": [
+        [
+          {
+            "node": "15_Actualizar ToDo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge_PDF'2": {
+      "main": [
+        [
+          {
+            "node": "16c_Normalizar para Gmail",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "12_Validar salida agente (Tareas)": {
+      "main": [
+        [
+          {
+            "node": "IF_More_Tasks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "12b_Validar salida agente (Tareas)": {
+      "main": [
+        [
+          {
+            "node": "13_Acumular Tareas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "11_Prepare_Context": {
+      "main": [
+        [
+          {
+            "node": "11_Extraer Tareas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "58b_Agrupar Imágenes + Marcadores": {
+      "main": [
+        [
+          {
+            "node": "Parseo a Objeto (Gemini→JSON)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "04b_Agrupar Audios + Marcadores": {
+      "main": [
+        [
+          {
+            "node": "Propagar metadatos2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "11_Extraer Tareas": {
+      "main": [
+        [
+          {
+            "node": "12_Validar salida agente (Tareas)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "6b_Renombrar binario Tareas": {
+      "main": [
+        [
+          {
+            "node": "Merge_PDF'2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Auditar": {
+      "main": [
+        [
+          {
+            "node": "16d_IF_PDFs_OK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "16c_Normalizar para Gmail": {
+      "main": [
+        [
+          {
+            "node": "Auditar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "16a_HTTP_export_acta": {
+      "main": [
+        [
+          {
+            "node": "6a_Renombrar binario Acta1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "16b_HTTP_export_tareas": {
+      "main": [
+        [
+          {
+            "node": "6b_Renombrar binario Tareas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "13b_Generar_Requests_Docs": {
+      "main": [
+        [
+          {
+            "node": "13c_Resolver_URLs_Imagen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "13b.1_Hacer públicas las imágenes": {
+      "main": [
+        [
+          {
+            "node": "13c_Resolver_URLs_Imagen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "13c_Resolver_URLs_Imagen": {
+      "main": [
+        [
+          {
+            "node": "13c.0_Compactar todas las requests",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "13d_Docs batchUpdate (Insertar texto+imágenes)": {
+      "main": [
+        [
+          {
+            "node": "16a_HTTP_export_acta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "13c.1_Unir DocId+Requests": {
+      "main": [
+        [
+          {
+            "node": "GUARD",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "13c.0_Compactar todas las requests": {
+      "main": [
+        [
+          {
+            "node": "13c.1_Unir DocId+Requests",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "GUARD": {
+      "main": [
+        [
+          {
+            "node": "13d_Docs batchUpdate (Insertar texto+imágenes)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Imagen -> Descripción (fallback 503)": {
+      "main": [
+        [
+          {
+            "node": "58b_Agrupar Imágenes + Marcadores",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parametros para Throttle": {
+      "main": [
+        [
+          {
+            "node": "UniversalThrottle TB (AI)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "17_Enviar Correo": {
+      "main": [
+        []
+      ]
+    },
+    "12b_Set_docActaId": {
+      "main": [
+        [
+          {
+            "node": "13c.1_Unir DocId+Requests",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "6a_Renombrar binario Acta1": {
+      "main": [
+        [
+          {
+            "node": "Merge_PDF'2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "16d_IF_PDFs_OK": {
+      "main": [
+        [
+          {
+            "node": "17_Enviar Correo",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        []
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "17_Enviar Correo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "66f869b7-9bb2-4ba9-90b0-a01bf4e1d5e8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3d4f59f6784da47ea196759e7eae916cc51694ef3c41f2ccdd438f1f6f1d22ad"
+  },
+  "id": "mLi6telwhbTdCQxG",
+  "tags": [
+    {
+      "updatedAt": "2025-10-16T08:10:20.324Z",
+      "createdAt": "2025-10-16T08:10:20.324Z",
+      "id": "hRa2IRxgKqmqKmy3",
+      "name": "FUNCIONAL"
+    },
+    {
+      "updatedAt": "2025-10-05T09:44:06.902Z",
+      "createdAt": "2025-10-05T09:44:06.902Z",
+      "id": "ngMIgn1hnkodYq5n",
+      "name": "debug"
+    }
+  ]
+}
